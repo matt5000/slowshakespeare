@@ -1,0 +1,28 @@
+# Secrets
+.env
+.env.local
+*.env
+
+# Pixlet output
+*.webp
+*.gif
+!tidbyt/preview.gif
+
+# macOS
+.DS_Store
+
+# Editor
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Python
+__pycache__/
+*.pyc
+
+# Logs
+*.log
+
+# Claude Code
+.claude/

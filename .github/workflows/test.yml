@@ -1,0 +1,44 @@
+name: Test
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  test-tidbyt:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install Pixlet
+        run: |
+          curl -LO https://github.com/tidbyt/pixlet/releases/latest/download/pixlet_linux_amd64.tar.gz
+          tar -xzf pixlet_linux_amd64.tar.gz
+          sudo mv pixlet /usr/local/bin/
+          pixlet version
+
+      - name: Check Starlark
+        run: pixlet check tidbyt/slow_shakespeare.star
+
+      - name: Run Tidbyt tests
+        run: python3 tidbyt/test_slow_shakespeare.py
+
+  test-web:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Run web tests
+        run: python3 web/test_slowshakespeare_web.py
