@@ -116,7 +116,7 @@
     }
 
     /* Buttons (shared base) */
-    .btn, .btn-small, .theme-btn {
+    .btn, .btn-small {
       background: none;
       border: 1.5px solid var(--accent);
       color: var(--accent);
@@ -126,18 +126,18 @@
       letter-spacing: 0.02em;
       transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease;
     }
-    .btn:hover, .btn-small:hover, .theme-btn:hover {
+    .btn:hover, .btn-small:hover {
       background: var(--accent);
       color: var(--bg);
       border-color: var(--accent);
     }
-    .btn.active, .theme-btn.active {
+    .btn.active {
       background: var(--accent);
       color: var(--bg);
       border-color: var(--accent);
     }
-    .btn:focus, .btn-small:focus, .theme-btn:focus { outline: none; }
-    .btn:focus-visible, .btn-small:focus-visible, .theme-btn:focus-visible {
+    .btn:focus, .btn-small:focus { outline: none; }
+    .btn:focus-visible, .btn-small:focus-visible {
       outline: 2px solid var(--accent);
       outline-offset: 3px;
     }
@@ -174,9 +174,14 @@
     }
     .setting-label {
       font-family: var(--font-ui);
-      font-size: 0.85rem;
+      font-size: 0.9rem;
       font-weight: 500;
       color: var(--ui);
+    }
+    .setting-group-divider {
+      margin-top: 16px;
+      padding-top: 16px;
+      border-top: 1px solid var(--ui-border);
     }
     .setting-row select,
     .setting-row input[type="date"] {
@@ -201,8 +206,8 @@
       gap: 8px;
     }
     .swatch {
-      width: 28px;
-      height: 28px;
+      width: 36px;
+      height: 36px;
       border-radius: 50%;
       border: 2px solid transparent;
       box-shadow: inset 0 0 0 1px rgba(128,128,128,0.3);
@@ -213,23 +218,48 @@
     .swatch:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
     .swatch.selected { border-color: var(--swatch-ring); }
 
-    /* Theme selector */
+    /* Theme selector (segmented control) */
     .theme-options {
-      display: flex;
-      gap: 6px;
+      display: inline-flex;
+      gap: 0;
+      border: 1px solid var(--ui-border);
+      border-radius: 4px;
+      overflow: hidden;
     }
     .theme-btn {
+      font-family: var(--font-ui);
       font-size: 0.85rem;
-      padding: 5px 14px;
+      padding: 8px 16px;
+      border: none;
+      border-radius: 0;
+      background: transparent;
+      color: var(--ui);
+      cursor: pointer;
+      transition: background 0.2s, color 0.2s;
+    }
+    .theme-btn:not(:last-child) {
+      border-right: 1px solid var(--ui-border);
+    }
+    .theme-btn.active {
+      background: var(--accent);
+      color: var(--bg);
+    }
+    .theme-btn:hover:not(.active) {
+      background: var(--ui-bg);
+    }
+    .theme-btn:focus { outline: none; }
+    .theme-btn:focus-visible {
+      outline: 2px solid var(--accent);
+      outline-offset: -2px;
     }
 
     /* Toggle switch */
     .toggle {
       position: relative;
-      width: 40px;
-      height: 22px;
+      width: 44px;
+      height: 26px;
       background: var(--ui-border);
-      border-radius: 11px;
+      border-radius: 13px;
       cursor: pointer;
       transition: background 0.2s;
     }
@@ -240,8 +270,8 @@
       position: absolute;
       top: 2px;
       left: 2px;
-      width: 18px;
-      height: 18px;
+      width: 22px;
+      height: 22px;
       background: var(--bg);
       border-radius: 50%;
       transition: transform 0.2s;
@@ -249,16 +279,19 @@
     .toggle.on::after { transform: translateX(18px); }
 
     /* Share link */
-    .share-row {
-      margin-top: 8px;
+    .share-controls {
       display: flex;
       gap: 8px;
+      flex: 1;
+      max-width: 70%;
     }
     .share-url {
       flex: 1;
+      min-width: 0;
       background: var(--bg);
       border: 1px solid var(--ui-border);
       color: var(--ui);
+      font-family: var(--font-ui);
       font-size: 0.8rem;
       padding: 6px 10px;
       border-radius: 4px;
@@ -291,6 +324,17 @@
 
     /* SEO sonnets (hidden when JS runs, visible in source for crawlers) */
     .seo-sonnets { display: none; }
+
+    /* Responsive: small phones */
+    @media (max-width: 480px) {
+      body { padding: 16px; }
+      .line { font-size: 1.5rem; }
+      .header { margin-bottom: 32px; }
+      .controls { margin-top: 32px; }
+      .settings { padding: 16px; }
+      .share-controls { max-width: 100%; }
+      .setting-row { flex-wrap: wrap; gap: 8px; }
+    }
 
     /* Reduced motion */
     @media (prefers-reduced-motion: reduce) {
@@ -330,7 +374,7 @@
         <input type="date" id="input-start">
       </div>
 
-      <div class="setting-row">
+      <div class="setting-row setting-group-divider">
         <span class="setting-label">Color</span>
         <div class="color-swatches" id="color-swatches"></div>
       </div>
@@ -344,7 +388,7 @@
         </div>
       </div>
 
-      <div class="setting-row">
+      <div class="setting-row setting-group-divider">
         <span class="setting-label" id="label-lines">Line numbers</span>
         <div class="toggle" id="toggle-lines" role="switch" aria-checked="false" aria-labelledby="label-lines" tabindex="0"></div>
       </div>
@@ -354,12 +398,12 @@
         <div class="toggle" id="toggle-selftest" role="switch" aria-checked="false" aria-labelledby="label-selftest" tabindex="0"></div>
       </div>
 
-      <div class="setting-row">
+      <div class="setting-row setting-group-divider">
         <span class="setting-label">Share</span>
-      </div>
-      <div class="share-row">
-        <input class="share-url" id="share-url" readonly>
-        <button class="btn-small" id="btn-copy">Copy</button>
+        <div class="share-controls">
+          <input class="share-url" id="share-url" readonly>
+          <button class="btn-small" id="btn-copy">Copy</button>
+        </div>
       </div>
     </div>
   </div>

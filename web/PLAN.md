@@ -35,11 +35,13 @@ Replicate the Tidbyt app's memorization functionality in a web app that works on
 ## Technical Approach
 
 ### Stack
-- **Single HTML file** — no build tools, no dependencies
+- **Template + data file** — `app.html` is the template, `data.js` has sonnets/colors/config
+- **No build tools, no dependencies** (besides Google Fonts CDN)
 - **Vanilla JavaScript** — no frameworks
 - **CSS variables** for theming
 - **localStorage** for settings persistence
 - **URL parameters** for sharing
+- **SEO**: Sonnet text in HTML source (hidden section) + meta/OG tags
 
 ### URL Parameters
 ```
@@ -75,17 +77,22 @@ const linesLearned = Math.min(dayWithinSonnet + 1, lines.length);
 ## File Structure
 
 ```
-apps/slowshakespeare-web/
-├── PLAN.md          # This file
-├── index.html       # The web app (single file)
-└── README.md        # Usage instructions
+web/
+├── index.html                    # Landing page (SEO, Sonnet 18, "Begin" CTA)
+├── app.html                      # Daily-use app (template — loads data.js)
+├── data.js                       # Sonnet text, color palettes, sonnet order
+├── CNAME                         # Custom domain for GitHub Pages
+├── PLAN.md                       # This file (gitignored)
+├── test_slowshakespeare_web.py   # Automated tests
+└── dev/                          # Development files (gitignored)
+    └── styleguide.html           # Visual style reference
 ```
 
 ## Design
 
 ### Visual Style
 - **Dark mode:** #1a1a1a background, light text — like Tidbyt
-- **Light mode:** #F5F0E8 warm parchment background, dark text
+- **Light mode:** #FDFCF9 warm snow background, dark text
 - **Auto mode:** follows system `prefers-color-scheme`
 - **Font pairing:**
   - **Poetry text:** EB Garamond (Google Fonts) — old-style roman serif, revival of Claude Garamond's types (contemporary of the First Folio's punchcutter Pierre Haultin). Georgia fallback.

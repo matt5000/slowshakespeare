@@ -426,6 +426,14 @@ def test_body_uses_ui_font():
     print("  ✓ Body uses --font-ui, poetry uses --font-content")
 
 
+def test_responsive_breakpoint():
+    """Responsive CSS media query present for small screens."""
+    content = read_html()
+    assert re.search(r"@media\s*\(\s*max-width", content), "Missing responsive media query"
+    assert "480px" in content, "Missing 480px breakpoint"
+    print("  ✓ Responsive breakpoint present")
+
+
 # ---------------------------------------------------------------------------
 # JavaScript logic tests (structural)
 # ---------------------------------------------------------------------------
@@ -689,6 +697,7 @@ def run_all_tests():
             test_toggle_accessibility,
             test_swatch_accessibility,
             test_body_uses_ui_font,
+            test_responsive_breakpoint,
         ]),
         ("JavaScript Logic", [
             test_calculate_function,
