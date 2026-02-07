@@ -1,0 +1,964 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="dark light">
+  <title>Slow Shakespeare — Learn Sonnets One Line at a Time</title>
+  <meta name="description" content="Learn Shakespeare's sonnets through daily repetition. One new line per day, fourteen days, one sonnet memorized.">
+  <meta property="og:title" content="Slow Shakespeare">
+  <meta property="og:description" content="Learn Shakespeare's sonnets one line at a time. One new line per day, fourteen days, one sonnet memorized.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://slowshakespeare.com/app.html">
+  <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&display=swap" rel="stylesheet">
+  <style>
+    /* Dark theme (default) + font stacks */
+    :root {
+      --font-content: 'EB Garamond', Georgia, 'Times New Roman', serif;
+      --font-ui: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      --bg: #1a1a1a;
+      --text: #8FBF8F;
+      --ui: #888;
+      --ui-dim: #555;
+      --ui-bg: #242424;
+      --ui-border: #333;
+      --swatch-ring: #fff;
+      --accent: #8FBF8F;
+      --accent-hover: #A5D5A5;
+    }
+
+    /* Light theme — bg updated from #F5F0E8 to #FDFCF9 (style guide warm snow) */
+    [data-theme="light"] {
+      --bg: #FDFCF9;
+      --ui: #6B6560;
+      --ui-dim: #B5A99A;
+      --ui-bg: #F7F5F0;
+      --ui-border: #E6E2DC;
+      --swatch-ring: #333;
+      --accent: #4A6B4A;
+      --accent-hover: #3A5A3A;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--font-ui);
+      min-height: 100dvh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      -webkit-font-smoothing: antialiased;
+      transition: background 0.3s, color 0.3s;
+    }
+
+    /* Main container */
+    .container {
+      max-width: 600px;
+      width: 100%;
+      text-align: center;
+    }
+
+    /* Header */
+    .header {
+      margin-bottom: 48px;
+    }
+    .sonnet-title {
+      font-family: var(--font-content);
+      font-size: 1.1rem;
+      font-weight: 400;
+      color: var(--ui);
+      font-style: italic;
+      margin-bottom: 4px;
+    }
+    .progress {
+      font-family: var(--font-ui);
+      font-size: 0.8rem;
+      color: var(--ui-dim);
+      letter-spacing: 0.02em;
+    }
+
+    /* Poetry display */
+    .poetry {
+      position: relative;
+      min-height: 120px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 32px 16px;
+    }
+    .line {
+      font-family: var(--font-content);
+      font-size: 1.8rem;
+      line-height: 1.5;
+      transition: opacity 0.6s ease;
+    }
+    .line.fade-out { opacity: 0; }
+    .line-number {
+      position: absolute;
+      bottom: 8px;
+      right: 16px;
+      font-size: 0.8rem;
+      color: var(--ui-dim);
+    }
+
+    /* Self-test overlay */
+    .reveal-overlay {
+      cursor: pointer;
+      font-family: var(--font-ui);
+      font-size: 1rem;
+      color: var(--ui-dim);
+      font-style: italic;
+      user-select: none;
+    }
+
+    /* Buttons (shared base) */
+    .btn, .btn-small, .theme-btn {
+      background: none;
+      border: 1.5px solid var(--accent);
+      color: var(--accent);
+      border-radius: 4px;
+      cursor: pointer;
+      font-family: var(--font-ui);
+      letter-spacing: 0.02em;
+      transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+    }
+    .btn:hover, .btn-small:hover, .theme-btn:hover {
+      background: var(--accent);
+      color: var(--bg);
+      border-color: var(--accent);
+    }
+    .btn.active, .theme-btn.active {
+      background: var(--accent);
+      color: var(--bg);
+      border-color: var(--accent);
+    }
+    .btn:focus, .btn-small:focus, .theme-btn:focus { outline: none; }
+    .btn:focus-visible, .btn-small:focus-visible, .theme-btn:focus-visible {
+      outline: 2px solid var(--accent);
+      outline-offset: 3px;
+    }
+
+    /* Controls */
+    .controls {
+      margin-top: 48px;
+      display: flex;
+      justify-content: center;
+      gap: 16px;
+    }
+    .btn {
+      font-size: 1rem;
+      padding: 10px 24px;
+    }
+
+    /* Settings panel */
+    .settings {
+      display: none;
+      margin-top: 40px;
+      text-align: left;
+      border-top: 1px solid var(--ui-border);
+      padding: 24px;
+      background: var(--ui-bg);
+      border-radius: 6px;
+    }
+    .settings.open { display: block; }
+
+    .setting-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 16px;
+    }
+    .setting-label {
+      font-family: var(--font-ui);
+      font-size: 0.85rem;
+      font-weight: 500;
+      color: var(--ui);
+    }
+    .setting-row select,
+    .setting-row input[type="date"] {
+      background: var(--bg);
+      border: 1px solid var(--ui-border);
+      color: var(--text);
+      font-family: var(--font-ui);
+      font-size: 0.9rem;
+      padding: 6px 10px;
+      border-radius: 4px;
+    }
+    .setting-row select:focus,
+    .setting-row input[type="date"]:focus {
+      border-color: var(--accent);
+      outline: 2px solid var(--accent);
+      outline-offset: 1px;
+    }
+
+    /* Color swatches */
+    .color-swatches {
+      display: flex;
+      gap: 8px;
+    }
+    .swatch {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      border: 2px solid transparent;
+      box-shadow: inset 0 0 0 1px rgba(128,128,128,0.3);
+      cursor: pointer;
+      transition: border-color 0.2s, transform 0.2s;
+    }
+    .swatch:hover { transform: scale(1.15); }
+    .swatch:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+    .swatch.selected { border-color: var(--swatch-ring); }
+
+    /* Theme selector */
+    .theme-options {
+      display: flex;
+      gap: 6px;
+    }
+    .theme-btn {
+      font-size: 0.85rem;
+      padding: 5px 14px;
+    }
+
+    /* Toggle switch */
+    .toggle {
+      position: relative;
+      width: 40px;
+      height: 22px;
+      background: var(--ui-border);
+      border-radius: 11px;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .toggle:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+    .toggle.on { background: var(--accent); }
+    .toggle::after {
+      content: '';
+      position: absolute;
+      top: 2px;
+      left: 2px;
+      width: 18px;
+      height: 18px;
+      background: var(--bg);
+      border-radius: 50%;
+      transition: transform 0.2s;
+    }
+    .toggle.on::after { transform: translateX(18px); }
+
+    /* Share link */
+    .share-row {
+      margin-top: 8px;
+      display: flex;
+      gap: 8px;
+    }
+    .share-url {
+      flex: 1;
+      background: var(--bg);
+      border: 1px solid var(--ui-border);
+      color: var(--ui);
+      font-size: 0.8rem;
+      padding: 6px 10px;
+      border-radius: 4px;
+    }
+    .btn-small {
+      font-size: 0.8rem;
+      padding: 6px 12px;
+    }
+
+    /* Review mode indicator */
+    .review-indicator {
+      font-family: var(--font-ui);
+      font-size: 0.8rem;
+      color: var(--ui-dim);
+      font-style: italic;
+      margin-top: 8px;
+      letter-spacing: 0.02em;
+    }
+
+    /* Dot marker for line 1 in review */
+    .dot-marker {
+      display: inline-block;
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--text);
+      margin-right: 8px;
+      vertical-align: middle;
+    }
+
+    /* SEO sonnets (hidden when JS runs, visible in source for crawlers) */
+    .seo-sonnets { display: none; }
+
+    /* Reduced motion */
+    @media (prefers-reduced-motion: reduce) {
+      .btn, .btn-small, .theme-btn, .toggle, .swatch, .line {
+        transition: none;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <div class="sonnet-title" id="sonnet-title"></div>
+      <div class="progress" id="progress"></div>
+    </div>
+
+    <div class="poetry">
+      <div class="line" id="line"></div>
+      <div class="line-number" id="line-number"></div>
+    </div>
+
+    <div class="review-indicator" id="review-indicator"></div>
+
+    <div class="controls">
+      <button class="btn" id="btn-review">Review</button>
+      <button class="btn" id="btn-settings">Settings</button>
+    </div>
+
+    <div class="settings" id="settings">
+      <div class="setting-row">
+        <span class="setting-label">Sonnet</span>
+        <select id="select-sonnet"></select>
+      </div>
+
+      <div class="setting-row">
+        <span class="setting-label">Day 1</span>
+        <input type="date" id="input-start">
+      </div>
+
+      <div class="setting-row">
+        <span class="setting-label">Color</span>
+        <div class="color-swatches" id="color-swatches"></div>
+      </div>
+
+      <div class="setting-row">
+        <span class="setting-label">Theme</span>
+        <div class="theme-options">
+          <button class="theme-btn" data-theme="auto">Auto</button>
+          <button class="theme-btn" data-theme="dark">Dark</button>
+          <button class="theme-btn" data-theme="light">Light</button>
+        </div>
+      </div>
+
+      <div class="setting-row">
+        <span class="setting-label" id="label-lines">Line numbers</span>
+        <div class="toggle" id="toggle-lines" role="switch" aria-checked="false" aria-labelledby="label-lines" tabindex="0"></div>
+      </div>
+
+      <div class="setting-row">
+        <span class="setting-label" id="label-selftest">Self-test</span>
+        <div class="toggle" id="toggle-selftest" role="switch" aria-checked="false" aria-labelledby="label-selftest" tabindex="0"></div>
+      </div>
+
+      <div class="setting-row">
+        <span class="setting-label">Share</span>
+      </div>
+      <div class="share-row">
+        <input class="share-url" id="share-url" readonly>
+        <button class="btn-small" id="btn-copy">Copy</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- SEO: Full sonnet text for search indexing (hidden by CSS, visible to crawlers) -->
+  <section id="sonnets" class="seo-sonnets">
+    <article>
+      <h2>Sonnet 1</h2>
+      <p>
+        From fairest creatures we desire increase,<br>
+        That thereby beauty's rose might never die,<br>
+        But as the riper should by time decrease,<br>
+        His tender heir might bear his memory:<br>
+        But thou, contracted to thine own bright eyes,<br>
+        Feed'st thy light's flame with self-substantial fuel,<br>
+        Making a famine where abundance lies,<br>
+        Thyself thy foe, to thy sweet self too cruel.<br>
+        Thou that art now the world's fresh ornament<br>
+        And only herald to the gaudy spring,<br>
+        Within thine own bud buriest thy content<br>
+        And, tender churl, makest waste in niggarding.<br>
+        Pity the world, or else this glutton be,<br>
+        To eat the world's due, by the grave and thee.
+      </p>
+    </article>
+    <article>
+      <h2>Sonnet 18</h2>
+      <p>
+        Shall I compare thee to a summer's day?<br>
+        Thou art more lovely and more temperate:<br>
+        Rough winds do shake the darling buds of May,<br>
+        And summer's lease hath all too short a date:<br>
+        Sometime too hot the eye of heaven shines,<br>
+        And often is his gold complexion dimm'd;<br>
+        And every fair from fair sometime declines,<br>
+        By chance, or nature's changing course untrimm'd;<br>
+        But thy eternal summer shall not fade,<br>
+        Nor lose possession of that fair thou ow'st;<br>
+        Nor shall death brag thou wander'st in his shade,<br>
+        When in eternal lines to time thou grow'st:<br>
+        So long as men can breathe, or eyes can see,<br>
+        So long lives this, and this gives life to thee.
+      </p>
+    </article>
+    <article>
+      <h2>Sonnet 29</h2>
+      <p>
+        When, in disgrace with fortune and men's eyes,<br>
+        I all alone beweep my outcast state,<br>
+        And trouble deaf heaven with my bootless cries,<br>
+        And look upon myself and curse my fate,<br>
+        Wishing me like to one more rich in hope,<br>
+        Featured like him, like him with friends possessed,<br>
+        Desiring this man's art and that man's scope,<br>
+        With what I most enjoy contented least;<br>
+        Yet in these thoughts myself almost despising,<br>
+        Haply I think on thee, and then my state,<br>
+        Like to the lark at break of day arising<br>
+        From sullen earth, sings hymns at heaven's gate;<br>
+        For thy sweet love remembered such wealth brings<br>
+        That then I scorn to change my state with kings.
+      </p>
+    </article>
+    <article>
+      <h2>Sonnet 30</h2>
+      <p>
+        When to the sessions of sweet silent thought<br>
+        I summon up remembrance of things past,<br>
+        I sigh the lack of many a thing I sought,<br>
+        And with old woes new wail my dear time's waste:<br>
+        Then can I drown an eye, unused to flow,<br>
+        For precious friends hid in death's dateless night,<br>
+        And weep afresh love's long since cancell'd woe,<br>
+        And moan the expense of many a vanish'd sight:<br>
+        Then can I grieve at grievances foregone,<br>
+        And heavily from woe to woe tell o'er<br>
+        The sad account of fore-bemoaned moan,<br>
+        Which I new pay as if not paid before.<br>
+        But if the while I think on thee, dear friend,<br>
+        All losses are restor'd and sorrows end.
+      </p>
+    </article>
+    <article>
+      <h2>Sonnet 55</h2>
+      <p>
+        Not marble, nor the gilded monuments<br>
+        Of princes, shall outlive this powerful rhyme;<br>
+        But you shall shine more bright in these contents<br>
+        Than unswept stone, besmear'd with sluttish time.<br>
+        When wasteful war shall statues overturn,<br>
+        And broils root out the work of masonry,<br>
+        Nor Mars his sword, nor war's quick fire shall burn<br>
+        The living record of your memory.<br>
+        'Gainst death, and all oblivious enmity<br>
+        Shall you pace forth; your praise shall still find room<br>
+        Even in the eyes of all posterity<br>
+        That wear this world out to the ending doom.<br>
+        So, till the judgment that yourself arise,<br>
+        You live in this, and dwell in lovers' eyes.
+      </p>
+    </article>
+    <article>
+      <h2>Sonnet 73</h2>
+      <p>
+        That time of year thou mayst in me behold<br>
+        When yellow leaves, or none, or few, do hang<br>
+        Upon those boughs which shake against the cold,<br>
+        Bare ruin'd choirs, where late the sweet birds sang.<br>
+        In me thou see'st the twilight of such day<br>
+        As after sunset fadeth in the west,<br>
+        Which by and by black night doth take away,<br>
+        Death's second self, that seals up all in rest.<br>
+        In me thou see'st the glowing of such fire<br>
+        That on the ashes of his youth doth lie,<br>
+        As the death-bed whereon it must expire,<br>
+        Consum'd with that which it was nourish'd by.<br>
+        This thou perceiv'st, which makes thy love more strong,<br>
+        To love that well which thou must leave ere long.
+      </p>
+    </article>
+    <article>
+      <h2>Sonnet 104</h2>
+      <p>
+        To me, fair friend, you never can be old,<br>
+        For as you were when first your eye I ey'd,<br>
+        Such seems your beauty still. Three winters cold,<br>
+        Have from the forests shook three summers' pride,<br>
+        Three beauteous springs to yellow autumn turn'd,<br>
+        In process of the seasons have I seen,<br>
+        Three April perfumes in three hot Junes burn'd,<br>
+        Since first I saw you fresh, which yet are green.<br>
+        Ah! yet doth beauty like a dial-hand,<br>
+        Steal from his figure, and no pace perceiv'd;<br>
+        So your sweet hue, which methinks still doth stand,<br>
+        Hath motion, and mine eye may be deceiv'd:<br>
+        For fear of which, hear this thou age unbred:<br>
+        Ere you were born was beauty's summer dead.
+      </p>
+    </article>
+    <article>
+      <h2>Sonnet 116</h2>
+      <p>
+        Let me not to the marriage of true minds<br>
+        Admit impediments. Love is not love<br>
+        Which alters when it alteration finds,<br>
+        Or bends with the remover to remove.<br>
+        O no, it is an ever-fixed mark<br>
+        That looks on tempests and is never shaken;<br>
+        It is the star to every wand'ring bark,<br>
+        Whose worth's unknown, although his height be taken.<br>
+        Love's not Time's fool, though rosy lips and cheeks<br>
+        Within his bending sickle's compass come;<br>
+        Love alters not with his brief hours and weeks,<br>
+        But bears it out even to the edge of doom.<br>
+        If this be error and upon me proved,<br>
+        I never writ, nor no man ever loved.
+      </p>
+    </article>
+    <article>
+      <h2>Sonnet 130</h2>
+      <p>
+        My mistress' eyes are nothing like the sun;<br>
+        Coral is far more red than her lips' red;<br>
+        If snow be white, why then her breasts are dun;<br>
+        If hairs be wires, black wires grow on her head.<br>
+        I have seen roses damasked, red and white,<br>
+        But no such roses see I in her cheeks;<br>
+        And in some perfumes is there more delight<br>
+        Than in the breath that from my mistress reeks.<br>
+        I love to hear her speak, yet well I know<br>
+        That music hath a far more pleasing sound;<br>
+        I grant I never saw a goddess go;<br>
+        My mistress, when she walks, treads on the ground.<br>
+        And yet, by heaven, I think my love as rare<br>
+        As any she belied with false compare.
+      </p>
+    </article>
+    <article>
+      <h2>Sonnet 138</h2>
+      <p>
+        When my love swears that she is made of truth<br>
+        I do believe her, though I know she lies,<br>
+        That she might think me some untutor'd youth,<br>
+        Unlearned in the world's false subtleties.<br>
+        Thus vainly thinking that she thinks me young,<br>
+        Although she knows my days are past the best,<br>
+        Simply I credit her false speaking tongue:<br>
+        On both sides thus is simple truth suppress'd.<br>
+        But wherefore says she not she is unjust?<br>
+        And wherefore say not I that I am old?<br>
+        O, love's best habit is in seeming trust,<br>
+        And age in love loves not to have years told:<br>
+        Therefore I lie with her and she with me,<br>
+        And in our faults by lies we flatter'd be.
+      </p>
+    </article>
+  </section>
+
+  <noscript>
+    <style>.seo-sonnets { display: block !important; }</style>
+  </noscript>
+
+<script src="data.js"></script>
+<script>
+// State
+let state = {
+  sonnet: "18",
+  startDate: todayStr(),
+  colorName: "salad",
+  showLines: false,
+  selfTest: false,
+  themePref: "auto",
+  revealed: false,
+  reviewing: false,
+  reviewIndex: 0,
+  reviewTimer: null,
+  fadeTimeout: null
+};
+
+// Elements
+const els = {};
+
+function init() {
+  els.sonnetTitle = document.getElementById('sonnet-title');
+  els.progress = document.getElementById('progress');
+  els.line = document.getElementById('line');
+  els.lineNumber = document.getElementById('line-number');
+  els.reviewIndicator = document.getElementById('review-indicator');
+  els.btnReview = document.getElementById('btn-review');
+  els.btnSettings = document.getElementById('btn-settings');
+  els.settings = document.getElementById('settings');
+  els.selectSonnet = document.getElementById('select-sonnet');
+  els.inputStart = document.getElementById('input-start');
+  els.swatchContainer = document.getElementById('color-swatches');
+  els.toggleLines = document.getElementById('toggle-lines');
+  els.toggleSelftest = document.getElementById('toggle-selftest');
+  els.shareUrl = document.getElementById('share-url');
+  els.btnCopy = document.getElementById('btn-copy');
+  els.themeButtons = document.querySelectorAll('.theme-btn');
+
+  // Build controls dynamically
+  buildDropdown();
+  buildSwatches();
+
+  // Load from URL params first, then localStorage
+  loadFromURL();
+  loadFromStorage();
+
+  // Apply state to UI controls
+  els.selectSonnet.value = state.sonnet;
+  els.inputStart.value = state.startDate;
+  applyTheme();
+  applyColor(state.colorName);
+  setToggle(els.toggleLines, state.showLines);
+  setToggle(els.toggleSelftest, state.selfTest);
+
+  // Event listeners
+  els.btnReview.addEventListener('click', toggleReview);
+  els.btnSettings.addEventListener('click', toggleSettings);
+  els.selectSonnet.addEventListener('change', onSonnetChange);
+  els.inputStart.addEventListener('change', onStartChange);
+  els.toggleLines.addEventListener('click', onToggleLines);
+  els.toggleLines.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onToggleLines(); }
+  });
+  els.toggleSelftest.addEventListener('click', onToggleSelftest);
+  els.toggleSelftest.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onToggleSelftest(); }
+  });
+  els.btnCopy.addEventListener('click', onCopy);
+  els.line.addEventListener('click', onLineClick);
+  els.themeButtons.forEach(b => b.addEventListener('click', onThemeClick));
+
+  // Listen for system theme changes (for auto mode)
+  window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
+    if (state.themePref === 'auto') applyTheme();
+  });
+
+  render();
+  updateShareURL();
+}
+
+function buildDropdown() {
+  SONNET_ORDER.forEach(id => {
+    const opt = document.createElement('option');
+    opt.value = id;
+    const first = SONNETS[id][0];
+    const preview = first.length > 25 ? first.slice(0, 25) + '...' : first;
+    opt.textContent = id + ' \u2014 ' + preview;
+    els.selectSonnet.appendChild(opt);
+  });
+}
+
+function buildSwatches() {
+  Object.entries(COLORS).forEach(([name, c]) => {
+    const div = document.createElement('div');
+    div.className = 'swatch';
+    div.dataset.name = name;
+    div.title = c.label;
+    div.setAttribute('role', 'radio');
+    div.setAttribute('aria-label', c.label);
+    div.tabIndex = 0;
+    div.style.background = c.swatch;
+    div.addEventListener('click', () => onSwatchClick(name));
+    div.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onSwatchClick(name); }
+    });
+    els.swatchContainer.appendChild(div);
+  });
+}
+
+function todayStr() {
+  const d = new Date();
+  return d.getFullYear() + '-' +
+    String(d.getMonth() + 1).padStart(2, '0') + '-' +
+    String(d.getDate()).padStart(2, '0');
+}
+
+function setToggle(el, on) {
+  el.classList.toggle('on', on);
+  el.setAttribute('aria-checked', String(on));
+}
+
+function isDarkMode() {
+  if (state.themePref === 'dark') return true;
+  if (state.themePref === 'light') return false;
+  return window.matchMedia('(prefers-color-scheme: dark)').matches;
+}
+
+function getTextColor(colorName) {
+  const c = COLORS[colorName];
+  return isDarkMode() ? c.dark : c.light;
+}
+
+function loadFromURL() {
+  const params = new URLSearchParams(window.location.search);
+  if (params.has('sonnet') && SONNETS[params.get('sonnet')]) {
+    state.sonnet = params.get('sonnet');
+  }
+  if (params.has('start')) {
+    const value = params.get('start');
+    if (/^\d{4}-\d{2}-\d{2}$/.test(value) && !isNaN(new Date(value).getTime())) {
+      state.startDate = value;
+    }
+  }
+  if (params.has('color') && COLORS[params.get('color')]) {
+    state.colorName = params.get('color');
+  }
+  if (params.has('lines')) {
+    state.showLines = params.get('lines') === 'on';
+  }
+  if (params.has('theme') && ['dark', 'light', 'auto'].includes(params.get('theme'))) {
+    state.themePref = params.get('theme');
+  }
+}
+
+function loadFromStorage() {
+  const stored = localStorage.getItem('slowshakespeare');
+  if (!stored) return;
+  try {
+    const data = JSON.parse(stored);
+    const params = new URLSearchParams(window.location.search);
+    if (!params.has('sonnet') && data.sonnet && SONNETS[data.sonnet]) state.sonnet = data.sonnet;
+    if (!params.has('start') && data.startDate) state.startDate = data.startDate;
+    if (!params.has('color') && data.colorName) state.colorName = data.colorName;
+    if (!params.has('lines') && data.showLines !== undefined) state.showLines = data.showLines;
+    if (!params.has('theme') && data.themePref) state.themePref = data.themePref;
+    if (data.selfTest !== undefined) state.selfTest = data.selfTest;
+  } catch (e) {}
+}
+
+function saveToStorage() {
+  localStorage.setItem('slowshakespeare', JSON.stringify({
+    sonnet: state.sonnet,
+    startDate: state.startDate,
+    colorName: state.colorName,
+    showLines: state.showLines,
+    selfTest: state.selfTest,
+    themePref: state.themePref
+  }));
+}
+
+function applyTheme() {
+  const dark = isDarkMode();
+  document.documentElement.setAttribute('data-theme', dark ? 'dark' : 'light');
+  els.themeButtons.forEach(b => {
+    b.classList.toggle('active', b.dataset.theme === state.themePref);
+  });
+  // Re-apply color for the current theme
+  applyColor(state.colorName);
+}
+
+function applyColor(name) {
+  state.colorName = name;
+  const textColor = getTextColor(name);
+  document.documentElement.style.setProperty('--text', textColor);
+  document.querySelectorAll('.swatch').forEach(s => {
+    s.classList.toggle('selected', s.dataset.name === name);
+  });
+}
+
+function calculate() {
+  const start = new Date(state.startDate + 'T00:00:00');
+  const now = new Date();
+  const todayMidnight = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  const totalDays = Math.floor((todayMidnight - start) / 86400000);
+  const safeDays = Math.max(0, totalDays);
+
+  const sonnetIndex = Math.max(0, SONNET_ORDER.indexOf(state.sonnet));
+  const sonnetsCompleted = Math.floor(safeDays / 14);
+  const dayWithinSonnet = safeDays % 14;
+
+  let currentIndex = (sonnetIndex + sonnetsCompleted) % SONNET_ORDER.length;
+  const currentSonnetId = SONNET_ORDER[currentIndex];
+  const lines = SONNETS[currentSonnetId];
+  const linesLearned = Math.min(dayWithinSonnet + 1, lines.length);
+
+  return { currentSonnetId, lines, linesLearned, dayWithinSonnet, safeDays };
+}
+
+function render() {
+  const { currentSonnetId, lines, linesLearned, dayWithinSonnet } = calculate();
+
+  els.sonnetTitle.textContent = 'Sonnet ' + currentSonnetId;
+  els.progress.textContent = 'Day ' + (dayWithinSonnet + 1) + ' of 14';
+  els.selectSonnet.value = currentSonnetId;
+
+  if (state.reviewing) {
+    renderReviewLine(lines, linesLearned);
+  } else {
+    const lineIndex = linesLearned - 1;
+    showLine(lines[lineIndex], lineIndex, false);
+    els.reviewIndicator.textContent = '';
+  }
+}
+
+function showLine(text, index, isReview) {
+  if (state.selfTest && !state.revealed && !isReview) {
+    els.line.classList.add('reveal-overlay');
+    els.line.textContent = 'tap to reveal';
+  } else {
+    els.line.classList.remove('reveal-overlay');
+    if (isReview && index === 0) {
+      els.line.innerHTML = '<span class="dot-marker"></span>' + escapeHTML(text);
+    } else {
+      els.line.textContent = text;
+    }
+  }
+
+  els.lineNumber.textContent = state.showLines ? (index + 1) : '';
+}
+
+function escapeHTML(str) {
+  const div = document.createElement('div');
+  div.textContent = str;
+  return div.innerHTML;
+}
+
+function onLineClick() {
+  if (state.selfTest && !state.revealed && !state.reviewing) {
+    state.revealed = true;
+    render();
+  }
+}
+
+// Review mode
+function toggleReview() {
+  if (state.reviewing) stopReview(); else startReview();
+}
+
+function startReview() {
+  const { linesLearned } = calculate();
+  if (linesLearned < 1) return;
+
+  state.reviewing = true;
+  state.reviewIndex = 0;
+  els.btnReview.textContent = 'Stop';
+  els.btnReview.classList.add('active');
+  render();
+
+  state.reviewTimer = setInterval(() => {
+    const { lines, linesLearned } = calculate();
+    state.reviewIndex++;
+    if (state.reviewIndex >= linesLearned) { stopReview(); return; }
+    fadeToLine(lines[state.reviewIndex], state.reviewIndex);
+    els.reviewIndicator.textContent = (state.reviewIndex + 1) + ' of ' + linesLearned;
+  }, 5000);
+}
+
+function stopReview() {
+  state.reviewing = false;
+  state.reviewIndex = 0;
+  clearInterval(state.reviewTimer);
+  state.reviewTimer = null;
+  clearTimeout(state.fadeTimeout);
+  state.fadeTimeout = null;
+  els.btnReview.textContent = 'Review';
+  els.btnReview.classList.remove('active');
+  state.revealed = false;
+  render();
+}
+
+function renderReviewLine(lines, linesLearned) {
+  const index = state.reviewIndex;
+  showLine(lines[index], index, true);
+  els.reviewIndicator.textContent = (index + 1) + ' of ' + linesLearned;
+}
+
+function fadeToLine(text, index) {
+  els.line.classList.add('fade-out');
+  state.fadeTimeout = setTimeout(() => {
+    showLine(text, index, true);
+    els.line.classList.remove('fade-out');
+  }, 300);
+}
+
+// Settings
+function toggleSettings() {
+  els.settings.classList.toggle('open');
+  els.btnSettings.classList.toggle('active');
+  updateShareURL();
+}
+
+function onSonnetChange() {
+  state.sonnet = els.selectSonnet.value;
+  state.revealed = false;
+  if (state.reviewing) stopReview();
+  saveToStorage();
+  render();
+  updateShareURL();
+}
+
+function onStartChange() {
+  const value = els.inputStart.value;
+  if (!value) return;
+  state.startDate = value;
+  state.revealed = false;
+  if (state.reviewing) stopReview();
+  saveToStorage();
+  render();
+  updateShareURL();
+}
+
+function onSwatchClick(name) {
+  applyColor(name);
+  saveToStorage();
+  updateShareURL();
+}
+
+function onThemeClick(e) {
+  state.themePref = e.target.dataset.theme;
+  applyTheme();
+  saveToStorage();
+  updateShareURL();
+}
+
+function onToggleLines() {
+  state.showLines = !state.showLines;
+  setToggle(els.toggleLines, state.showLines);
+  saveToStorage();
+  render();
+  updateShareURL();
+}
+
+function onToggleSelftest() {
+  state.selfTest = !state.selfTest;
+  state.revealed = false;
+  setToggle(els.toggleSelftest, state.selfTest);
+  saveToStorage();
+  render();
+}
+
+function updateShareURL() {
+  const params = new URLSearchParams();
+  params.set('start', state.startDate);
+  params.set('sonnet', state.sonnet);
+  params.set('color', state.colorName);
+  params.set('lines', state.showLines ? 'on' : 'off');
+  if (state.themePref !== 'auto') params.set('theme', state.themePref);
+  const base = window.location.origin === "null"
+    ? window.location.href.split('?')[0]
+    : window.location.origin + window.location.pathname;
+  els.shareUrl.value = base + '?' + params.toString();
+}
+
+function onCopy() {
+  els.shareUrl.select();
+  navigator.clipboard.writeText(els.shareUrl.value).then(() => {
+    els.btnCopy.textContent = 'Copied';
+    setTimeout(() => { els.btnCopy.textContent = 'Copy'; }, 2000);
+  }).catch(() => {
+    if (document.execCommand('copy')) {
+      els.btnCopy.textContent = 'Copied';
+      setTimeout(() => { els.btnCopy.textContent = 'Copy'; }, 2000);
+    }
+  });
+}
+
+document.addEventListener('DOMContentLoaded', init);
+</script>
+</body>
+</html>

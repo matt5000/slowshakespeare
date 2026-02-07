@@ -145,7 +145,6 @@ def test_schema_has_color_dropdown():
     content = read_star_file()
     assert 'id = "color"' in content, "Missing color id in schema"
     assert "Salad Days" in content, "Missing Salad Days option"
-    assert "Yellow Leaves" in content, "Missing Yellow Leaves option"
     assert "Milk of Kindness" in content, "Missing Milk of Kindness option"
     assert "Midsummer Night" in content, "Missing Midsummer Night option"
     assert "All That Glisters" in content, "Missing All That Glisters option"
@@ -156,9 +155,9 @@ def test_schema_has_color_dropdown():
 def test_default_color_is_salad_days():
     """Test that default color is Salad Days green."""
     content = read_star_file()
-    assert "#6B8E6B" in content, "Missing Salad Days green color"
-    assert 'default = "#6B8E6B"' in content, "Default color should be Salad Days"
-    print("✓ Default color is Salad Days (#6B8E6B)")
+    assert "#8FBF8F" in content, "Missing Salad Days green color"
+    assert 'default = "#8FBF8F"' in content, "Default color should be Salad Days"
+    print("✓ Default color is Salad Days (#8FBF8F)")
 
 
 def test_has_review_mode_at_minute_zero():

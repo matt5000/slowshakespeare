@@ -174,7 +174,7 @@ SONNETS = {
 }
 
 # Default text color
-DEFAULT_COLOR = "#6B8E6B"  # calm green
+DEFAULT_COLOR = "#8FBF8F"  # Salad Days
 
 # Sonnet order for auto-advance
 SONNET_ORDER = ["1", "18", "29", "30", "55", "73", "104", "116", "130", "138"]
@@ -417,31 +417,27 @@ def get_schema():
                 name = "Text Color",
                 desc = "Color of the poem text",
                 icon = "palette",
-                default = "#6B8E6B",
+                default = "#8FBF8F",
                 options = [
                     schema.Option(
                         display = "Salad Days",
-                        value = "#6B8E6B",
-                    ),
-                    schema.Option(
-                        display = "Yellow Leaves",
-                        value = "#C9956C",
+                        value = "#8FBF8F",
                     ),
                     schema.Option(
                         display = "Milk of Kindness",
-                        value = "#E8E0D5",
+                        value = "#B5A99A",
                     ),
                     schema.Option(
                         display = "Midsummer Night",
-                        value = "#7A9EAF",
+                        value = "#7BA3D4",
                     ),
                     schema.Option(
                         display = "All That Glisters",
-                        value = "#C4A747",
+                        value = "#D4B86A",
                     ),
                     schema.Option(
                         display = "Damask Rose",
-                        value = "#C4A0A0",
+                        value = "#D4856E",
                     ),
                 ],
             ),

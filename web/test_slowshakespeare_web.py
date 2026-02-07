@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Tests for Slow Shakespeare web app (index.html).
+"""Tests for Slow Shakespeare web app (app.html).
 
 Tests the core logic (day calculation, sonnet advancement, color system,
 URL params, settings) by reimplementing the JavaScript logic in Python
@@ -13,7 +13,8 @@ import sys
 from datetime import date, timedelta
 
 APP_DIR = os.path.dirname(os.path.abspath(__file__))
-HTML_FILE = os.path.join(APP_DIR, "index.html")
+HTML_FILE = os.path.join(APP_DIR, "app.html")
+DATA_JS_FILE = os.path.join(APP_DIR, "data.js")
 TIDBYT_FILE = os.path.join(APP_DIR, "..", "tidbyt", "slow_shakespeare.star")
 
 SONNET_ORDER = ["1", "18", "29", "30", "55", "73", "104", "116", "130", "138"]
@@ -46,18 +47,22 @@ SONNET_LAST_LINES = {
 }
 
 COLORS = {
-    "salad": {"dark": "#8FBF8F", "light": "#4A6B4A", "swatch": "#6B8E6B"},
-    "yellow": {"dark": "#D4A76A", "light": "#7A5C2E", "swatch": "#C9956C"},
-    "milk": {"dark": "#E8DFD0", "light": "#4A4540", "swatch": "#E8E0D5"},
-    "midsummer": {"dark": "#8BBDD4", "light": "#3A6478", "swatch": "#7A9EAF"},
-    "glisters": {"dark": "#D4B85A", "light": "#6B5A1E", "swatch": "#C4A747"},
-    "damask": {"dark": "#D4A0A8", "light": "#7A4A52", "swatch": "#C4A0A0"},
+    "salad": {"dark": "#8FBF8F", "light": "#4A6B4A", "swatch": "#3E6D4E"},
+    "milk": {"dark": "#B5A99A", "light": "#4A4540", "swatch": "#B5A99A"},
+    "midsummer": {"dark": "#7BA3D4", "light": "#2B4578", "swatch": "#2B4578"},
+    "glisters": {"dark": "#D4B86A", "light": "#6B5A1E", "swatch": "#B8993E"},
+    "damask": {"dark": "#D4856E", "light": "#B44430", "swatch": "#B44430"},
     "ink": {"dark": "#D5CFC5", "light": "#2A2520", "swatch": "#2A2520"},
 }
 
 
 def read_html():
     with open(HTML_FILE, "r", encoding="utf-8") as f:
+        return f.read()
+
+
+def read_data_js():
+    with open(DATA_JS_FILE, "r", encoding="utf-8") as f:
         return f.read()
 
 
@@ -71,7 +76,7 @@ def read_tidbyt():
 def calculate(start_date_str, sonnet_id, today=None):
     """Reimplement the JS calculate() function in Python.
 
-    This must exactly match the logic in index.html.
+    This must exactly match the logic in app.html.
     """
     if today is None:
         today = date.today()
@@ -216,7 +221,7 @@ def test_all_sonnets_present():
 
 def test_each_sonnet_has_14_lines():
     """Each sonnet should have exactly 14 lines in the JS array."""
-    content = read_html()
+    content = read_data_js()
     for sid in SONNET_ORDER:
         # Match the array for this sonnet: "18": [\n ... ]
         pattern = rf'"{sid}":\s*\[(.*?)\]'
@@ -250,23 +255,23 @@ def test_sonnet_text_parity_with_tidbyt():
 # ---------------------------------------------------------------------------
 
 def test_all_colors_in_html():
-    """All 7 color themes present with correct hex values."""
-    content = read_html()
+    """All 6 color themes present with correct hex values in data.js."""
+    content = read_data_js()
     for name, vals in COLORS.items():
         assert vals["dark"] in content, f"Missing dark variant for {name}: {vals['dark']}"
         assert vals["light"] in content, f"Missing light variant for {name}: {vals['light']}"
         assert vals["swatch"] in content, f"Missing swatch for {name}: {vals['swatch']}"
-    print("  ✓ All 7 color themes present with correct hex values")
+    print("  ✓ All 6 color themes present with correct hex values")
 
 
 def test_color_labels_present():
-    """All color labels present in HTML."""
-    content = read_html()
-    labels = ["Salad Days", "Yellow Leaves", "Milk of Kindness",
+    """All color labels present in data.js."""
+    content = read_data_js()
+    labels = ["Salad Days", "Milk of Kindness",
               "Midsummer Night", "All That Glisters", "Damask Rose", "Black Ink"]
     for label in labels:
         assert label in content, f"Missing color label: {label}"
-    print("  ✓ All 7 color labels present")
+    print("  ✓ All 6 color labels present")
 
 
 def test_ink_distinct_from_milk():
@@ -561,6 +566,55 @@ def test_valid_date_format():
 
 
 # ---------------------------------------------------------------------------
+# Data file and SEO tests
+# ---------------------------------------------------------------------------
+
+def test_data_js_exists():
+    """data.js file exists."""
+    assert os.path.exists(DATA_JS_FILE), "data.js not found"
+    print("  ✓ data.js exists")
+
+
+def test_data_js_loaded():
+    """app.html loads data.js before inline script."""
+    content = read_html()
+    assert '<script src="data.js"></script>' in content, "Missing data.js script tag"
+    # data.js must appear before the inline script
+    data_pos = content.index('<script src="data.js">')
+    inline_pos = content.index('<script>', data_pos + 1)
+    assert data_pos < inline_pos, "data.js must load before inline script"
+    print("  ✓ data.js loaded before inline script")
+
+
+def test_seo_meta_tags():
+    """SEO meta tags present in app.html."""
+    content = read_html()
+    assert 'name="description"' in content, "Missing meta description"
+    assert 'property="og:title"' in content, "Missing og:title"
+    assert 'property="og:description"' in content, "Missing og:description"
+    print("  ✓ SEO meta tags present")
+
+
+def test_seo_sonnets_section():
+    """All 10 sonnets present in HTML SEO section."""
+    content = read_html()
+    assert 'id="sonnets"' in content, "Missing sonnets section"
+    assert 'class="seo-sonnets"' in content, "Missing seo-sonnets class"
+    for sid in SONNET_ORDER:
+        assert f"Sonnet {sid}" in content, f"Missing Sonnet {sid} in SEO section"
+    print("  ✓ All 10 sonnets in SEO section")
+
+
+def test_seo_sonnets_hidden():
+    """SEO sonnets hidden by CSS, with noscript fallback."""
+    content = read_html()
+    assert ".seo-sonnets" in content, "Missing .seo-sonnets CSS"
+    assert "display: none" in content, "Missing display: none for seo-sonnets"
+    assert "<noscript>" in content, "Missing noscript fallback"
+    print("  ✓ SEO sonnets hidden with noscript fallback")
+
+
+# ---------------------------------------------------------------------------
 # Helpers
 # ---------------------------------------------------------------------------
 
@@ -654,6 +708,13 @@ def run_all_tests():
         ]),
         ("URL Validation", [
             test_valid_date_format,
+        ]),
+        ("Data File & SEO", [
+            test_data_js_exists,
+            test_data_js_loaded,
+            test_seo_meta_tags,
+            test_seo_sonnets_section,
+            test_seo_sonnets_hidden,
         ]),
     ]
 
