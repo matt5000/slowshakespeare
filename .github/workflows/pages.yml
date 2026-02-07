@@ -5,6 +5,7 @@ on:
     branches: [main]
     paths:
       - 'web/**'
+      - '.github/workflows/pages.yml'
 
 permissions:
   contents: read
