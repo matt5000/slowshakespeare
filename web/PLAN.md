@@ -79,7 +79,8 @@ const linesLearned = Math.min(dayWithinSonnet + 1, lines.length);
 ```
 web/
 ├── index.html                    # Landing page (SEO, Sonnet 18, "Begin" CTA)
-├── app.html                      # Daily-use app (template — loads data.js)
+├── app.html                      # Daily-use app (template — loads style.css + data.js)
+├── style.css                     # All CSS (themes, layout, components, responsive)
 ├── data.js                       # Sonnet text, color palettes, sonnet order
 ├── CNAME                         # Custom domain for GitHub Pages
 ├── PLAN.md                       # This file (gitignored)

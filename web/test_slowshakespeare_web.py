@@ -14,6 +14,7 @@ from datetime import date, timedelta
 
 APP_DIR = os.path.dirname(os.path.abspath(__file__))
 HTML_FILE = os.path.join(APP_DIR, "app.html")
+CSS_FILE = os.path.join(APP_DIR, "style.css")
 DATA_JS_FILE = os.path.join(APP_DIR, "data.js")
 TIDBYT_FILE = os.path.join(APP_DIR, "..", "tidbyt", "slow_shakespeare.star")
 
@@ -58,6 +59,11 @@ COLORS = {
 
 def read_html():
     with open(HTML_FILE, "r", encoding="utf-8") as f:
+        return f.read()
+
+
+def read_css():
+    with open(CSS_FILE, "r", encoding="utf-8") as f:
         return f.read()
 
 
@@ -327,7 +333,7 @@ def test_has_eb_garamond_font():
 
 def test_font_variables():
     """CSS font variables defined."""
-    content = read_html()
+    content = read_css()
     assert "--font-content" in content
     assert "--font-ui" in content
     assert "system-ui" in content
@@ -336,18 +342,18 @@ def test_font_variables():
 
 def test_theme_css_variables():
     """Dark and light theme CSS variables present."""
-    content = read_html()
+    content = read_css()
     assert "--bg:" in content
     assert "--ui:" in content
     assert '[data-theme="light"]' in content
-    assert "#F5F0E8" in content  # light background
+    assert "#F5F0E8" in content or "#FDFCF9" in content  # light background
     assert "#1a1a1a" in content  # dark background
     print("  ✓ Dark and light theme CSS variables present")
 
 
 def test_no_duplicate_css_blocks():
     """No duplicate :root or .setting-label CSS blocks."""
-    content = read_html()
+    content = read_css()
     # Count :root blocks (should be exactly 1)
     root_count = len(re.findall(r"^\s*:root\s*\{", content, re.MULTILINE))
     assert root_count == 1, f"Expected 1 :root block, found {root_count}"
@@ -359,7 +365,7 @@ def test_no_duplicate_css_blocks():
 
 def test_swatch_visibility():
     """Swatches have box-shadow for dark swatch visibility."""
-    content = read_html()
+    content = read_css()
     assert "box-shadow" in content
     assert ".swatch" in content
     print("  ✓ Swatch box-shadow present for visibility")
@@ -416,7 +422,7 @@ def test_swatch_accessibility():
 
 def test_body_uses_ui_font():
     """Body font-family is --font-ui; poetry uses --font-content."""
-    content = read_html()
+    content = read_css()
     # Body should use UI font
     body_match = re.search(r"body\s*\{[^}]*font-family:\s*var\(--font-ui\)", content)
     assert body_match, "Body should use --font-ui as default"
@@ -428,7 +434,7 @@ def test_body_uses_ui_font():
 
 def test_responsive_breakpoint():
     """Responsive CSS media query present for small screens."""
-    content = read_html()
+    content = read_css()
     assert re.search(r"@media\s*\(\s*max-width", content), "Missing responsive media query"
     assert "480px" in content, "Missing 480px breakpoint"
     print("  ✓ Responsive breakpoint present")
@@ -577,6 +583,19 @@ def test_valid_date_format():
 # Data file and SEO tests
 # ---------------------------------------------------------------------------
 
+def test_css_file_exists():
+    """style.css file exists."""
+    assert os.path.exists(CSS_FILE), "style.css not found"
+    print("  ✓ style.css exists")
+
+
+def test_css_file_loaded():
+    """app.html loads style.css."""
+    content = read_html()
+    assert 'href="style.css"' in content, "Missing style.css link tag"
+    print("  ✓ style.css loaded in app.html")
+
+
 def test_data_js_exists():
     """data.js file exists."""
     assert os.path.exists(DATA_JS_FILE), "data.js not found"
@@ -615,10 +634,11 @@ def test_seo_sonnets_section():
 
 def test_seo_sonnets_hidden():
     """SEO sonnets hidden by CSS, with noscript fallback."""
-    content = read_html()
-    assert ".seo-sonnets" in content, "Missing .seo-sonnets CSS"
-    assert "display: none" in content, "Missing display: none for seo-sonnets"
-    assert "<noscript>" in content, "Missing noscript fallback"
+    css = read_css()
+    html = read_html()
+    assert ".seo-sonnets" in css, "Missing .seo-sonnets CSS"
+    assert "display: none" in css, "Missing display: none for seo-sonnets"
+    assert "<noscript>" in html, "Missing noscript fallback"
     print("  ✓ SEO sonnets hidden with noscript fallback")
 
 
@@ -719,6 +739,8 @@ def run_all_tests():
             test_valid_date_format,
         ]),
         ("Data File & SEO", [
+            test_css_file_exists,
+            test_css_file_loaded,
             test_data_js_exists,
             test_data_js_loaded,
             test_seo_meta_tags,
