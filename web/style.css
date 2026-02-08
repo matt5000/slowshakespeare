@@ -136,9 +136,9 @@ body {
   margin-top: auto;
   padding-top: 48px;
   display: flex;
+  flex-wrap: wrap;
   justify-content: center;
   gap: 16px;
-  position: relative;
 }
 .btn {
   font-size: 1rem;
@@ -148,19 +148,13 @@ body {
 /* Settings panel */
 .settings {
   display: none;
-  position: absolute;
-  bottom: 100%;
-  left: 50%;
-  transform: translateX(-50%);
-  margin-bottom: 16px;
+  flex-basis: 100%;
+  margin-top: 24px;
   text-align: left;
   border: 1px solid var(--ui-border);
   padding: 24px;
   background: var(--ui-bg);
   border-radius: 6px;
-  width: max(280px, 90vw);
-  max-width: 400px;
-  box-shadow: 0 -4px 20px rgba(0,0,0,0.15);
 }
 .settings.open { display: block; }
 
