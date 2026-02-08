@@ -43,13 +43,26 @@ body {
 
 /* Main container */
 .container {
-  max-width: 600px;
+  max-width: 500px;
   width: 100%;
   text-align: center;
   flex: 1;
-  max-height: 700px;
   display: flex;
   flex-direction: column;
+}
+
+/* Desktop: card layout */
+@media (min-width: 600px) {
+  body {
+    justify-content: center;
+  }
+  .container {
+    flex: none;
+    background: var(--ui-bg);
+    border: 1px solid var(--ui-border);
+    border-radius: 12px;
+    padding: 48px;
+  }
 }
 
 /* Header */
