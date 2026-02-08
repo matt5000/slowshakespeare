@@ -293,7 +293,8 @@ let state = {
   showLines: false,
   selfTest: false,
   themePref: "auto",
-  revealed: false,
+  selfTestIndex: 0,
+  selfTestRevealed: false,
   reviewing: false,
   reviewIndex: 0,
   reviewTimer: null,
@@ -509,6 +510,11 @@ function render() {
 
   if (state.reviewing) {
     renderReviewLine(lines, linesLearned);
+  } else if (state.selfTest) {
+    // Self-test: cycle through lines 0 to linesLearned-1
+    const idx = Math.min(state.selfTestIndex, linesLearned - 1);
+    showLine(lines[idx], idx, false);
+    els.reviewIndicator.textContent = (idx + 1) + ' of ' + linesLearned;
   } else {
     const lineIndex = linesLearned - 1;
     showLine(lines[lineIndex], lineIndex, false);
@@ -517,7 +523,7 @@ function render() {
 }
 
 function showLine(text, index, isReview) {
-  if (state.selfTest && !state.revealed && !isReview) {
+  if (state.selfTest && !state.selfTestRevealed && !isReview) {
     els.line.classList.add('reveal-overlay');
     els.line.textContent = 'tap to reveal';
   } else {
@@ -539,9 +545,19 @@ function escapeHTML(str) {
 }
 
 function onLineClick() {
-  if (state.selfTest && !state.revealed && !state.reviewing) {
-    state.revealed = true;
-    render();
+  if (state.selfTest && !state.reviewing) {
+    const { linesLearned } = calculate();
+    if (!state.selfTestRevealed) {
+      // Reveal current line
+      state.selfTestRevealed = true;
+      render();
+    } else if (state.selfTestIndex < linesLearned - 1) {
+      // Advance to next line (hidden)
+      state.selfTestIndex++;
+      state.selfTestRevealed = false;
+      render();
+    }
+    // If at last line and revealed, do nothing (stay on last line)
   }
 }
 
@@ -589,7 +605,8 @@ function stopReview() {
   els.btnReview.textContent = 'Review';
   els.btnReview.classList.remove('active');
   els.reviewProgress.classList.remove('active');
-  state.revealed = false;
+  state.selfTestIndex = 0;
+  state.selfTestRevealed = false;
   render();
 }
 
@@ -615,7 +632,8 @@ function toggleSettings() {
 
 function onSonnetChange() {
   state.sonnet = els.selectSonnet.value;
-  state.revealed = false;
+  state.selfTestIndex = 0;
+  state.selfTestRevealed = false;
   if (state.reviewing) stopReview();
   saveToStorage();
   render();
@@ -625,7 +643,8 @@ function onStartChange() {
   const value = els.inputStart.value;
   if (!value) return;
   state.startDate = value;
-  state.revealed = false;
+  state.selfTestIndex = 0;
+  state.selfTestRevealed = false;
   if (state.reviewing) stopReview();
   saveToStorage();
   render();
@@ -651,7 +670,8 @@ function onToggleLines() {
 
 function onToggleSelftest() {
   state.selfTest = !state.selfTest;
-  state.revealed = false;
+  state.selfTestIndex = 0;
+  state.selfTestRevealed = false;
   setToggle(els.toggleSelftest, state.selfTest);
   saveToStorage();
   render();

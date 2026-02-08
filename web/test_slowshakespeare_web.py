@@ -527,10 +527,11 @@ def test_review_mode_structure():
 
 
 def test_selftest_mode():
-    """Self-test mode has reveal logic."""
+    """Self-test mode cycles through lines with reveal logic."""
     content = read_html()
     assert "state.selfTest" in content
-    assert "state.revealed" in content
+    assert "state.selfTestIndex" in content
+    assert "state.selfTestRevealed" in content
     assert "tap to reveal" in content
     print("  ✓ Self-test mode present")
 
