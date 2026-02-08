@@ -4,27 +4,31 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Slow Shakespeare — Learn Sonnets One Line at a Time</title>
+  <meta name="color-scheme" content="dark light">
   <meta name="description" content="Learn Shakespeare's sonnets through daily repetition. One new line per day, fourteen days, one sonnet memorized.">
+  <link rel="canonical" href="https://slowshakespeare.com/">
+  <meta name="theme-color" content="#FDFCF9" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#1a1a1a" media="(prefers-color-scheme: dark)">
 
   <!-- Open Graph -->
   <meta property="og:title" content="Slow Shakespeare">
   <meta property="og:description" content="Learn Shakespeare's sonnets one line at a time. One new line per day, fourteen days, one sonnet memorized.">
   <meta property="og:type" content="website">
-  <meta property="og:url" content="https://slowshakespeare.com">
+  <meta property="og:url" content="https://slowshakespeare.com/">
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Slow Shakespeare">
+  <meta name="twitter:description" content="Learn Shakespeare's sonnets one line at a time. One new line per day, fourteen days, one sonnet memorized.">
 
   <!-- Fonts -->
   <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&display=swap" rel="stylesheet">
 
   <style>
-    /* ═══════════════════════════════════════════
-       DESIGN TOKENS
-       ═══════════════════════════════════════════ */
-
+    /* ── Design Tokens ── */
     :root {
       --font-content: 'EB Garamond', Georgia, 'Times New Roman', serif;
       --font-ui: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-
-      /* Light theme (default — warm snow) */
       --bg: #FDFCF9;
       --text: #2A2520;
       --text-muted: #6B6560;
@@ -32,12 +36,7 @@
       --accent: #4A6B4A;
       --accent-hover: #3A5A3A;
       --rule: #E6E2DC;
-      --card-bg: #F7F5F0;
-
-      /* Book of Hours accents */
-      --ultramarine: #2B4578;
     }
-
     @media (prefers-color-scheme: dark) {
       :root {
         --bg: #1a1a1a;
@@ -47,211 +46,176 @@
         --accent: #8FBF8F;
         --accent-hover: #A5D5A5;
         --rule: #333;
-        --card-bg: #242424;
-        --ultramarine: #7BA3D4;
       }
     }
 
-    /* ═══════════════════════════════════════════
-       RESET & BASE
-       ═══════════════════════════════════════════ */
-
+    /* ── Reset ── */
     * { margin: 0; padding: 0; box-sizing: border-box; }
 
     body {
       background: var(--bg);
       color: var(--text);
       font-family: var(--font-content);
-      font-size: 18px;
-      line-height: 1.7;
-      padding: 80px 24px 60px;
-      max-width: 600px;
-      margin: 0 auto;
       -webkit-font-smoothing: antialiased;
     }
 
-    /* ═══════════════════════════════════════════
-       TYPOGRAPHY
-       ═══════════════════════════════════════════ */
+    /* ── Hero ── */
+    .hero {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 32px;
+      text-align: center;
+      position: relative;
+    }
 
     .title {
-      font-family: var(--font-content);
-      font-size: 3rem;
+      font-size: clamp(3rem, 10vw, 8rem);
       font-weight: 400;
-      line-height: 1.15;
-      letter-spacing: 0.01em;
-      text-align: center;
+      line-height: 1.0;
+      letter-spacing: -0.02em;
     }
 
     .tagline {
-      font-family: var(--font-content);
-      font-size: 1.05rem;
-      font-weight: 400;
-      font-variant: small-caps;
-      letter-spacing: 0.06em;
-      line-height: 1.6;
-      text-align: center;
-    }
-
-    .body-text {
-      font-family: var(--font-content);
+      margin-top: 32px;
       font-size: 1.1rem;
-      font-weight: 400;
-      line-height: 1.7;
-      text-align: center;
+      font-style: italic;
+      color: var(--text-muted);
+      line-height: 1.6;
     }
 
-    /* ═══════════════════════════════════════════
-       SONNET
-       ═══════════════════════════════════════════ */
+    .hero-cta {
+      margin-top: 48px;
+      font-family: var(--font-content);
+      font-size: 1.15rem;
+      color: var(--accent);
+      text-decoration: none;
+      letter-spacing: 0.02em;
+      transition: opacity 0.2s;
+    }
+    .hero-cta:hover { opacity: 0.7; }
+    .hero-cta:focus-visible {
+      outline: 2px solid var(--accent);
+      outline-offset: 4px;
+    }
 
-    .sonnet {
-      max-width: 480px;
+    /* Scroll hint */
+    .scroll-hint {
+      position: absolute;
+      bottom: 32px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-family: var(--font-ui);
+      font-size: 0.7rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--ornament);
+      animation: drift 2s ease-in-out infinite;
+    }
+
+    @keyframes drift {
+      0%, 100% { transform: translateX(-50%) translateY(0); }
+      50% { transform: translateX(-50%) translateY(6px); }
+    }
+
+    /* ── Sonnet section ── */
+    .sonnet-section {
+      max-width: 600px;
       margin: 0 auto;
+      padding: 80px 32px 120px;
+    }
+
+    .sonnet-label {
+      font-family: var(--font-ui);
+      font-size: 0.7rem;
+      font-weight: 500;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin-bottom: 32px;
+      text-align: center;
     }
 
     .sonnet-text {
-      font-family: var(--font-content);
-      font-size: 1.35rem;
-      font-weight: 400;
-      line-height: 1.8;
-    }
-
-    .sonnet-text::first-letter {
-      font-weight: 400;
-      font-size: 4.2rem;
-      float: left;
-      line-height: 0.8;
-      margin-right: 8px;
-      margin-top: 6px;
-      color: var(--ultramarine);
-    }
-
-    .attribution {
-      font-family: var(--font-content);
-      font-size: 1rem;
-      font-style: italic;
-      color: var(--text-muted);
-      text-align: right;
-      margin-top: 20px;
-    }
-
-    /* ═══════════════════════════════════════════
-       ORNAMENTS
-       ═══════════════════════════════════════════ */
-
-    .fleuron {
-      text-align: center;
       font-size: 1.4rem;
-      color: var(--ornament);
-      margin: 40px 0;
-      letter-spacing: 0.3em;
+      line-height: 1.85;
+      text-align: center;
     }
 
-    .fleuron-rule {
-      display: flex;
-      align-items: center;
-      gap: 20px;
-      margin: 40px 0;
-      color: var(--ornament);
+    /* Scroll-reveal */
+    .reveal {
+      opacity: 0;
+      transform: translateY(24px);
+      transition: opacity 0.8s ease, transform 0.8s ease;
+    }
+    .reveal.visible {
+      opacity: 1;
+      transform: translateY(0);
     }
 
-    .fleuron-rule::before,
-    .fleuron-rule::after {
-      content: '';
-      flex: 1;
+    /* ── Rule divider ── */
+    .rule {
+      width: 40px;
       height: 1px;
       background: var(--ornament);
-      opacity: 0.4;
+      opacity: 0.5;
+      margin: 0 auto;
     }
 
-    .fleuron-rule span {
-      font-size: 1.2rem;
-    }
-
-    /* ═══════════════════════════════════════════
-       BUTTON
-       ═══════════════════════════════════════════ */
-
-    .btn {
-      display: inline-block;
-      font-family: var(--font-content);
-      font-size: 1.1rem;
-      font-variant: small-caps;
-      letter-spacing: 0.08em;
-      color: var(--accent);
-      border: 1.5px solid var(--accent);
-      padding: 12px 40px;
-      border-radius: 4px;
-      text-decoration: none;
-      cursor: pointer;
-      background: transparent;
-      transition: background 0.2s ease, color 0.2s ease;
-    }
-
-    .btn:hover {
-      background: var(--accent);
-      color: var(--bg);
-    }
-
-    /* Focus visible for keyboard nav */
-    .btn:focus { outline: none; }
-    .btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
-
-    /* ═══════════════════════════════════════════
-       FOOTER
-       ═══════════════════════════════════════════ */
-
-    .footer {
-      font-family: var(--font-ui);
-      font-size: 0.8rem;
-      color: var(--text-muted);
-      letter-spacing: 0.02em;
+    /* ── Explanation ── */
+    .explanation {
+      max-width: 600px;
+      margin: 0 auto;
+      padding: 60px 32px 80px;
       text-align: center;
-    }
-
-    .footer a {
+      font-size: 1.1rem;
+      line-height: 1.8;
       color: var(--text-muted);
-      text-decoration: none;
     }
 
-    .footer a:hover {
-      color: var(--text);
+    /* ── Footer ── */
+    .footer {
+      border-top: 1px solid var(--rule);
+      padding: 24px 32px;
+      font-family: var(--font-ui);
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      text-align: center;
+      letter-spacing: 0.02em;
     }
+    .footer a { color: var(--text-muted); text-decoration: none; }
+    .footer a:hover { color: var(--text); }
 
-    /* ═══════════════════════════════════════════
-       RESPONSIVE
-       ═══════════════════════════════════════════ */
-
+    /* ── Responsive ── */
     @media (max-width: 480px) {
-      body { padding: 60px 20px 40px; }
-      .title { font-size: 2.4rem; }
+      .hero { padding: 24px; }
+      .sonnet-section { padding: 60px 24px 80px; }
       .sonnet-text { font-size: 1.2rem; }
-      .sonnet-text::first-letter { font-size: 3.4rem; }
+      .explanation { padding: 40px 24px 60px; }
     }
-
-    /* ═══════════════════════════════════════════
-       REDUCED MOTION
-       ═══════════════════════════════════════════ */
 
     @media (prefers-reduced-motion: reduce) {
-      .btn { transition: none; }
+      * { transition: none !important; animation: none !important; }
+      .reveal { opacity: 1; transform: none; }
     }
   </style>
 </head>
 <body>
 
-  <!-- Title -->
-  <header style="margin-bottom: 60px;">
+  <!-- Hero -->
+  <section class="hero">
     <h1 class="title">Slow Shakespeare</h1>
-  </header>
+    <p class="tagline">One line per day. Fourteen days.<br>One sonnet memorized.</p>
+    <a href="app.html" class="hero-cta">Begin &rarr;</a>
+    <div class="scroll-hint" aria-hidden="true">&darr;</div>
+  </section>
 
-  <!-- Fleuron -->
-  <div class="fleuron" aria-hidden="true">&#10086;</div>
-
-  <!-- Sonnet 18 -->
-  <div class="sonnet" style="margin-top: 40px;">
-    <p class="sonnet-text">
+  <!-- Sonnet -->
+  <section class="sonnet-section">
+    <div class="sonnet-label reveal">Sonnet 18</div>
+    <p class="sonnet-text reveal">
       Shall I compare thee to a summer's day?<br>
       Thou art more lovely and more temperate:<br>
       Rough winds do shake the darling buds of May,<br>
@@ -264,43 +228,36 @@
       Nor lose possession of that fair thou ow'st;<br>
       Nor shall death brag thou wander'st in his shade,<br>
       When in eternal lines to time thou grow'st:<br>
-      &emsp;So long as men can breathe, or eyes can see,<br>
-      &emsp;So long lives this, and this gives life to thee.
+      So long as men can breathe, or eyes can see,<br>
+      So long lives this, and this gives life to thee.
     </p>
-    <div class="attribution">&#8212; Sonnet 18</div>
-  </div>
+  </section>
 
-  <!-- Fleuron -->
-  <div class="fleuron" style="margin-top: 60px;" aria-hidden="true">&#10087;</div>
+  <div class="rule reveal"></div>
 
-  <!-- Tagline -->
-  <div style="text-align: center; margin-top: 40px;">
-    <p class="tagline">One line per day. Fourteen days. One sonnet memorized.</p>
-  </div>
-
-  <!-- CTA -->
-  <div style="text-align: center; margin-top: 40px;">
-    <a href="app.html" class="btn">Begin</a>
-  </div>
-
-  <!-- Divider -->
-  <div class="fleuron-rule" style="margin-top: 60px;" aria-hidden="true"><span>&#10086;</span></div>
-
-  <!-- How it works -->
-  <div style="text-align: center; margin-top: 40px;">
-    <p class="body-text" style="max-width: 400px; margin: 0 auto;">
+  <div class="explanation reveal">
+    <p>
       Each day reveals one new line.<br>
       By day fourteen, the whole poem<br>
       is yours by heart.
     </p>
   </div>
 
-  <!-- Footer -->
-  <footer style="margin-top: 80px;">
-    <div class="footer">
-      Ten sonnets &#183; <a href="app.html">Web</a> &#183; Tidbyt &#183; iOS
-    </div>
+  <footer class="footer">
+    Ten sonnets &middot; <a href="app.html">Web</a> &middot; Tidbyt
   </footer>
 
+  <script>
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('visible');
+          observer.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.15 });
+
+    document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+  </script>
 </body>
 </html>

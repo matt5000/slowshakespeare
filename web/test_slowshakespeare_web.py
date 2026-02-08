@@ -14,6 +14,7 @@ from datetime import date, timedelta
 
 APP_DIR = os.path.dirname(os.path.abspath(__file__))
 HTML_FILE = os.path.join(APP_DIR, "app.html")
+INDEX_FILE = os.path.join(APP_DIR, "index.html")
 CSS_FILE = os.path.join(APP_DIR, "style.css")
 DATA_JS_FILE = os.path.join(APP_DIR, "data.js")
 TIDBYT_FILE = os.path.join(APP_DIR, "..", "tidbyt", "slow_shakespeare.star")
@@ -57,26 +58,31 @@ COLORS = {
 }
 
 
-def read_html():
-    with open(HTML_FILE, "r", encoding="utf-8") as f:
+def read_file(path):
+    with open(path, "r", encoding="utf-8") as f:
         return f.read()
+
+
+def read_html():
+    return read_file(HTML_FILE)
+
+
+def read_index():
+    return read_file(INDEX_FILE)
 
 
 def read_css():
-    with open(CSS_FILE, "r", encoding="utf-8") as f:
-        return f.read()
+    return read_file(CSS_FILE)
 
 
 def read_data_js():
-    with open(DATA_JS_FILE, "r", encoding="utf-8") as f:
-        return f.read()
+    return read_file(DATA_JS_FILE)
 
 
 def read_tidbyt():
     if not os.path.exists(TIDBYT_FILE):
         return None
-    with open(TIDBYT_FILE, "r", encoding="utf-8") as f:
-        return f.read()
+    return read_file(TIDBYT_FILE)
 
 
 def calculate(start_date_str, sonnet_id, today=None):
@@ -301,15 +307,15 @@ def test_wcag_contrast_dark():
 
 
 def test_wcag_contrast_light():
-    """All light-mode colors pass WCAG AA (4.5:1) on #F5F0E8."""
-    bg = (0xF5, 0xF0, 0xE8)
+    """All light-mode colors pass WCAG AA (4.5:1) on #FDFCF9."""
+    bg = (0xFD, 0xFC, 0xF9)
     for name, vals in COLORS.items():
         fg = hex_to_rgb(vals["light"])
         ratio = contrast_ratio(fg, bg)
         assert ratio >= 4.5, (
             f"{name} light ({vals['light']}): contrast {ratio:.1f}:1 < 4.5:1"
         )
-    print("  ✓ All light-mode colors pass WCAG AA on #F5F0E8")
+    print("  ✓ All light-mode colors pass WCAG AA on #FDFCF9")
 
 
 # ---------------------------------------------------------------------------
@@ -642,6 +648,235 @@ def test_seo_sonnets_hidden():
     print("  ✓ SEO sonnets hidden with noscript fallback")
 
 
+def test_canonical_urls():
+    """Both pages have canonical link tags."""
+    app = read_html()
+    index = read_index()
+    assert 'rel="canonical"' in app, "Missing canonical in app.html"
+    assert 'rel="canonical"' in index, "Missing canonical in index.html"
+    assert 'href="https://slowshakespeare.com/app.html"' in app, (
+        "Wrong canonical URL in app.html"
+    )
+    assert 'href="https://slowshakespeare.com/"' in index, (
+        "Wrong canonical URL in index.html"
+    )
+    print("  ✓ Canonical URLs present on both pages")
+
+
+def test_twitter_cards():
+    """Both pages have Twitter Card meta tags."""
+    app = read_html()
+    index = read_index()
+    for name, content in [("app.html", app), ("index.html", index)]:
+        assert 'twitter:card' in content, f"Missing twitter:card in {name}"
+        assert 'twitter:title' in content, f"Missing twitter:title in {name}"
+        assert 'twitter:description' in content, f"Missing twitter:description in {name}"
+    print("  ✓ Twitter Card meta tags on both pages")
+
+
+def test_theme_color_meta():
+    """Both pages have theme-color meta tag."""
+    app = read_html()
+    index = read_index()
+    assert 'name="theme-color"' in app, "Missing theme-color in app.html"
+    assert 'name="theme-color"' in index, "Missing theme-color in index.html"
+    print("  ✓ theme-color meta tag on both pages")
+
+
+# ---------------------------------------------------------------------------
+# Landing page (index.html) tests
+# ---------------------------------------------------------------------------
+
+def test_index_has_doctype():
+    """index.html starts with DOCTYPE."""
+    content = read_index()
+    assert content.strip().startswith("<!DOCTYPE html>"), "Missing DOCTYPE"
+    print("  ✓ index.html has DOCTYPE")
+
+
+def test_index_has_lang():
+    """index.html has lang attribute."""
+    content = read_index()
+    assert '<html lang="en">' in content, "Missing lang attribute"
+    print("  ✓ index.html has lang='en'")
+
+
+def test_index_has_viewport():
+    """index.html has viewport meta tag."""
+    content = read_index()
+    assert 'name="viewport"' in content
+    assert "width=device-width" in content
+    print("  ✓ index.html has viewport meta")
+
+
+def test_index_has_color_scheme():
+    """index.html has color-scheme meta tag."""
+    content = read_index()
+    assert 'name="color-scheme"' in content, "Missing color-scheme meta"
+    print("  ✓ index.html has color-scheme meta")
+
+
+def test_index_has_description():
+    """index.html has meta description."""
+    content = read_index()
+    assert 'name="description"' in content, "Missing meta description"
+    print("  ✓ index.html has meta description")
+
+
+def test_index_has_og_tags():
+    """index.html has Open Graph meta tags."""
+    content = read_index()
+    assert 'property="og:title"' in content, "Missing og:title"
+    assert 'property="og:description"' in content, "Missing og:description"
+    assert 'property="og:type"' in content, "Missing og:type"
+    assert 'property="og:url"' in content, "Missing og:url"
+    print("  ✓ index.html has Open Graph tags")
+
+
+def test_index_has_h1():
+    """index.html has a single h1."""
+    content = read_index()
+    h1_count = content.count("<h1")
+    assert h1_count == 1, f"Expected 1 <h1>, found {h1_count}"
+    assert "Slow Shakespeare" in content
+    print("  ✓ index.html has single h1")
+
+
+def test_index_has_begin_cta():
+    """index.html has a Begin link to app.html."""
+    content = read_index()
+    assert 'href="app.html"' in content, "Missing link to app.html"
+    assert "Begin" in content, "Missing 'Begin' CTA text"
+    print("  ✓ index.html has Begin CTA linking to app.html")
+
+
+def test_index_has_sonnet_text():
+    """index.html includes Sonnet 18 text for SEO."""
+    content = read_index()
+    assert "Shall I compare thee to a summer's day?" in content
+    assert "So long lives this, and this gives life to thee." in content
+    print("  ✓ index.html includes Sonnet 18 text")
+
+
+def test_index_has_eb_garamond():
+    """index.html loads EB Garamond font."""
+    content = read_index()
+    assert "EB+Garamond" in content or "EB Garamond" in content
+    print("  ✓ index.html loads EB Garamond")
+
+
+def test_index_responsive():
+    """index.html has responsive CSS."""
+    content = read_index()
+    assert "@media" in content, "Missing media query"
+    assert "480px" in content, "Missing 480px breakpoint"
+    print("  ✓ index.html has responsive CSS")
+
+
+def test_index_reduced_motion():
+    """index.html respects prefers-reduced-motion."""
+    content = read_index()
+    assert "prefers-reduced-motion" in content, "Missing reduced motion media query"
+    print("  ✓ index.html respects prefers-reduced-motion")
+
+
+def test_index_dark_mode():
+    """index.html supports dark mode via prefers-color-scheme."""
+    content = read_index()
+    assert "prefers-color-scheme: dark" in content, "Missing dark mode support"
+    assert "#1a1a1a" in content, "Missing dark background color"
+    print("  ✓ index.html supports dark mode")
+
+
+def test_index_focus_visible():
+    """index.html uses :focus-visible for keyboard navigation."""
+    content = read_index()
+    assert "focus-visible" in content, "Missing :focus-visible styles"
+    print("  ✓ index.html uses :focus-visible")
+
+
+def test_index_no_ios_reference():
+    """index.html does not reference iOS (no app exists yet)."""
+    content = read_index()
+    # Check footer area specifically — "iOS" as a standalone word
+    assert "iOS" not in content, "Footer references iOS but no iOS app exists"
+    print("  ✓ index.html does not reference nonexistent iOS app")
+
+
+def test_index_hero_section():
+    """index.html has a full-viewport hero section."""
+    content = read_index()
+    assert "100vh" in content, "Missing 100vh hero"
+    assert 'class="hero"' in content, "Missing hero section"
+    assert 'class="hero-cta"' in content, "Missing hero CTA"
+    print("  ✓ index.html has full-viewport hero")
+
+
+def test_index_scroll_reveal():
+    """index.html has scroll-reveal with IntersectionObserver."""
+    content = read_index()
+    assert 'class="reveal' in content or "reveal" in content, "Missing reveal class"
+    assert "IntersectionObserver" in content, "Missing IntersectionObserver"
+    assert ".reveal.visible" in content, "Missing .reveal.visible CSS"
+    print("  ✓ index.html has scroll-reveal animation")
+
+
+def test_index_scroll_hint():
+    """index.html has animated scroll hint."""
+    content = read_index()
+    assert 'class="scroll-hint"' in content, "Missing scroll hint"
+    assert 'aria-hidden="true"' in content, "Scroll hint should be aria-hidden"
+    assert "@keyframes" in content, "Missing scroll hint animation"
+    print("  ✓ index.html has scroll hint with animation")
+
+
+def test_index_no_fleurons():
+    """index.html no longer uses typographic ornaments."""
+    content = read_index()
+    assert "fleuron" not in content, "Should not contain fleuron classes"
+    assert "&#10086;" not in content, "Should not contain fleuron characters"
+    assert "&#10087;" not in content, "Should not contain fleuron characters"
+    print("  ✓ index.html has no fleurons (modern design)")
+
+
+# ---------------------------------------------------------------------------
+# Additional best-practice tests
+# ---------------------------------------------------------------------------
+
+def test_app_has_color_scheme():
+    """app.html has color-scheme meta tag."""
+    content = read_html()
+    assert 'name="color-scheme"' in content, "Missing color-scheme meta in app.html"
+    print("  ✓ app.html has color-scheme meta")
+
+
+def test_reduced_motion_css():
+    """style.css respects prefers-reduced-motion."""
+    content = read_css()
+    assert "prefers-reduced-motion" in content, "Missing reduced motion in style.css"
+    assert "transition: none" in content, "Should disable transitions for reduced motion"
+    print("  ✓ style.css respects prefers-reduced-motion")
+
+
+def test_escape_html_function():
+    """escapeHTML function exists for XSS prevention in review mode."""
+    content = read_html()
+    assert "function escapeHTML(" in content, "Missing escapeHTML function"
+    # Should use textContent for safe escaping (not regex replacement)
+    assert "textContent" in content, "escapeHTML should use textContent for safety"
+    print("  ✓ escapeHTML function present for XSS prevention")
+
+
+def test_dom_content_loaded():
+    """init() is called on DOMContentLoaded, not immediately."""
+    content = read_html()
+    assert "DOMContentLoaded" in content, "Missing DOMContentLoaded listener"
+    assert "addEventListener('DOMContentLoaded', init)" in content, (
+        "init should be registered as DOMContentLoaded listener"
+    )
+    print("  ✓ init() called on DOMContentLoaded")
+
+
 # ---------------------------------------------------------------------------
 # Helpers
 # ---------------------------------------------------------------------------
@@ -704,7 +939,7 @@ def run_all_tests():
             test_wcag_contrast_dark,
             test_wcag_contrast_light,
         ]),
-        ("HTML Structure", [
+        ("App HTML Structure", [
             test_has_viewport_meta,
             test_has_eb_garamond_font,
             test_font_variables,
@@ -734,6 +969,8 @@ def run_all_tests():
             test_date_input_validation,
             test_sonnet_id_validation_storage,
             test_calculate_guards_negative_index,
+            test_escape_html_function,
+            test_dom_content_loaded,
         ]),
         ("URL Validation", [
             test_valid_date_format,
@@ -746,6 +983,34 @@ def run_all_tests():
             test_seo_meta_tags,
             test_seo_sonnets_section,
             test_seo_sonnets_hidden,
+            test_canonical_urls,
+            test_twitter_cards,
+            test_theme_color_meta,
+        ]),
+        ("Landing Page (index.html)", [
+            test_index_has_doctype,
+            test_index_has_lang,
+            test_index_has_viewport,
+            test_index_has_color_scheme,
+            test_index_has_description,
+            test_index_has_og_tags,
+            test_index_has_h1,
+            test_index_has_begin_cta,
+            test_index_has_sonnet_text,
+            test_index_has_eb_garamond,
+            test_index_responsive,
+            test_index_reduced_motion,
+            test_index_dark_mode,
+            test_index_focus_visible,
+            test_index_no_ios_reference,
+            test_index_hero_section,
+            test_index_scroll_reveal,
+            test_index_scroll_hint,
+            test_index_no_fleurons,
+        ]),
+        ("Best Practices", [
+            test_app_has_color_scheme,
+            test_reduced_motion_css,
         ]),
     ]
 
