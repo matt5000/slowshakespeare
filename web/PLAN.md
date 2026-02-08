@@ -146,14 +146,14 @@ web/
 
 ## Implementation Steps
 
-1. [ ] Create basic HTML structure with sonnet data
-2. [ ] Implement day calculation logic
-3. [ ] Add localStorage for settings
-4. [ ] Style with CSS (dark theme, responsive)
-5. [ ] Add settings panel
-6. [ ] Implement review mode animation
-7. [ ] Add URL parameter support for sharing
-8. [ ] Add PWA manifest for home screen install
+1. [x] Create basic HTML structure with sonnet data
+2. [x] Implement day calculation logic
+3. [x] Add localStorage for settings
+4. [x] Style with CSS (dark theme, responsive)
+5. [x] Add settings panel
+6. [x] Implement review mode animation
+7. [x] Add URL parameter support for sharing
+8. [ ] ~~Add PWA manifest for home screen install~~ (deferred)
 9. [ ] Test on mobile Safari, Chrome
 10. [ ] Update README with usage instructions
 
