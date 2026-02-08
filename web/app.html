@@ -43,45 +43,45 @@
       <button class="btn" id="btn-review">Review</button>
       <button class="btn" id="btn-settings">Settings</button>
       <div class="settings" id="settings">
-      <div class="setting-row">
-        <span class="setting-label">Sonnet</span>
-        <select id="select-sonnet"></select>
-      </div>
-
-      <div class="setting-row">
-        <span class="setting-label">Day 1</span>
-        <input type="date" id="input-start">
-      </div>
-
-      <div class="setting-row setting-group-divider">
-        <span class="setting-label">Color</span>
-        <div class="color-swatches" id="color-swatches"></div>
-      </div>
-
-      <div class="setting-row">
-        <span class="setting-label">Theme</span>
-        <div class="theme-options">
-          <button class="theme-btn" data-theme="auto">Auto</button>
-          <button class="theme-btn" data-theme="dark">Dark</button>
-          <button class="theme-btn" data-theme="light">Light</button>
+        <div class="settings-section">
+          <div class="setting-row">
+            <span class="setting-label">Sonnet</span>
+            <select id="select-sonnet"></select>
+          </div>
+          <div class="setting-row">
+            <span class="setting-label">Started</span>
+            <input type="date" id="input-start">
+          </div>
         </div>
-      </div>
 
-      <div class="setting-row setting-group-divider">
-        <span class="setting-label" id="label-lines">Line numbers</span>
-        <div class="toggle" id="toggle-lines" role="switch" aria-checked="false" aria-labelledby="label-lines" tabindex="0"></div>
-      </div>
+        <div class="settings-section">
+          <div class="setting-row">
+            <span class="setting-label">Color</span>
+            <div class="color-swatches" id="color-swatches"></div>
+          </div>
+          <div class="setting-row">
+            <span class="setting-label">Theme</span>
+            <div class="theme-options">
+              <button class="theme-btn" data-theme="auto">Auto</button>
+              <button class="theme-btn" data-theme="dark">Dark</button>
+              <button class="theme-btn" data-theme="light">Light</button>
+            </div>
+          </div>
+        </div>
 
-      <div class="setting-row">
-        <span class="setting-label" id="label-selftest">Self-test</span>
-        <div class="toggle" id="toggle-selftest" role="switch" aria-checked="false" aria-labelledby="label-selftest" tabindex="0"></div>
-      </div>
+        <div class="settings-section">
+          <div class="setting-row">
+            <span class="setting-label" id="label-lines">Line numbers</span>
+            <div class="toggle" id="toggle-lines" role="switch" aria-checked="false" aria-labelledby="label-lines" tabindex="0"></div>
+          </div>
+          <div class="setting-row">
+            <span class="setting-label" id="label-selftest">Self-test</span>
+            <div class="toggle" id="toggle-selftest" role="switch" aria-checked="false" aria-labelledby="label-selftest" tabindex="0"></div>
+          </div>
+        </div>
 
-      <div class="setting-row setting-group-divider">
-        <span class="setting-label">Share</span>
-        <button class="btn-small" id="btn-share">Share</button>
+        <button class="btn-share" id="btn-share">Share</button>
       </div>
-    </div>
     </div>
   </div>
 
@@ -367,8 +367,8 @@ function buildDropdown() {
     const opt = document.createElement('option');
     opt.value = id;
     const first = SONNETS[id][0];
-    const preview = first.length > 25 ? first.slice(0, 25) + '...' : first;
-    opt.textContent = id + ' \u2014 ' + preview;
+    const preview = first.length > 20 ? first.slice(0, 20) + '…' : first;
+    opt.textContent = id + ': ' + preview;
     els.selectSonnet.appendChild(opt);
   });
 }
