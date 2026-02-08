@@ -47,6 +47,7 @@ body {
   width: 100%;
   text-align: center;
   flex: 1;
+  max-height: 700px;
   display: flex;
   flex-direction: column;
 }
