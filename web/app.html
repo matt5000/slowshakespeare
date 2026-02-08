@@ -37,6 +37,7 @@
     </div>
 
     <div class="review-indicator" id="review-indicator"></div>
+    <div class="review-progress" id="review-progress"><div class="review-progress-bar"></div></div>
 
     <div class="controls">
       <button class="btn" id="btn-review">Review</button>
@@ -312,6 +313,7 @@ function init() {
   els.line = document.getElementById('line');
   els.lineNumber = document.getElementById('line-number');
   els.reviewIndicator = document.getElementById('review-indicator');
+  els.reviewProgress = document.getElementById('review-progress');
   els.btnReview = document.getElementById('btn-review');
   els.btnSettings = document.getElementById('btn-settings');
   els.settings = document.getElementById('settings');
@@ -562,6 +564,8 @@ function startReview() {
   state.reviewIndex = 0;
   els.btnReview.textContent = 'Stop';
   els.btnReview.classList.add('active');
+  els.reviewProgress.classList.add('active');
+  restartProgressBar();
   render();
 
   state.reviewTimer = setInterval(() => {
@@ -570,7 +574,15 @@ function startReview() {
     if (state.reviewIndex >= linesLearned) { stopReview(); return; }
     fadeToLine(lines[state.reviewIndex], state.reviewIndex);
     els.reviewIndicator.textContent = (state.reviewIndex + 1) + ' of ' + linesLearned;
+    restartProgressBar();
   }, 5000);
+}
+
+function restartProgressBar() {
+  const bar = els.reviewProgress.querySelector('.review-progress-bar');
+  bar.style.animation = 'none';
+  bar.offsetHeight; // trigger reflow
+  bar.style.animation = '';
 }
 
 function stopReview() {
@@ -582,6 +594,7 @@ function stopReview() {
   state.fadeTimeout = null;
   els.btnReview.textContent = 'Review';
   els.btnReview.classList.remove('active');
+  els.reviewProgress.classList.remove('active');
   state.revealed = false;
   render();
 }
