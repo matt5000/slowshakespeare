@@ -54,7 +54,8 @@ body {
 /* Desktop: card layout */
 @media (min-width: 600px) {
   body {
-    justify-content: center;
+    justify-content: flex-start;
+    padding-top: 12vh;
   }
   .container {
     flex: none;
