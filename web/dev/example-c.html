@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="dark light">
+  <title>Example C — Asymmetric Split</title>
+  <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&display=swap" rel="stylesheet">
+  <style>
+    /* ── Design Tokens (same as production) ── */
+    :root {
+      --font-content: 'EB Garamond', Georgia, 'Times New Roman', serif;
+      --font-ui: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      --bg: #FDFCF9;
+      --text: #2A2520;
+      --text-muted: #6B6560;
+      --ornament: #B5A99A;
+      --accent: #4A6B4A;
+      --accent-hover: #3A5A3A;
+      --rule: #E6E2DC;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #1a1a1a;
+        --text: #D5CFC5;
+        --text-muted: #888;
+        --ornament: #555;
+        --accent: #8FBF8F;
+        --accent-hover: #A5D5A5;
+        --rule: #333;
+      }
+    }
+
+    /* ── Reset ── */
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--font-content);
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ── Two-column layout ──
+       Left: title + tagline + CTA (sticky).
+       Right: sonnet (scrollable).
+       Grid splits roughly 2:3. */
+
+    .page {
+      display: grid;
+      grid-template-columns: 2fr 3fr;
+      min-height: 100vh;
+    }
+
+    /* ── Left column ── */
+
+    .left {
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 64px 48px 64px 64px;
+      border-right: 1px solid var(--rule);
+    }
+
+    .title {
+      font-size: 4.2rem;
+      font-weight: 400;
+      line-height: 1.05;
+      letter-spacing: -0.01em;
+    }
+
+    .tagline {
+      margin-top: 24px;
+      font-size: 1.05rem;
+      font-style: italic;
+      color: var(--text-muted);
+      line-height: 1.6;
+    }
+
+    .cta {
+      margin-top: 40px;
+    }
+
+    .cta a {
+      display: inline-block;
+      font-family: var(--font-content);
+      font-size: 1.05rem;
+      color: var(--accent);
+      text-decoration: none;
+      border: 1px solid var(--accent);
+      border-radius: 100px;
+      padding: 10px 28px;
+      transition: background 0.2s, color 0.2s;
+    }
+
+    .cta a:hover {
+      background: var(--accent);
+      color: var(--bg);
+    }
+
+    .cta a:focus-visible {
+      outline: 2px solid var(--accent);
+      outline-offset: 3px;
+    }
+
+    .left-footer {
+      margin-top: auto;
+      padding-top: 40px;
+      font-family: var(--font-ui);
+      font-size: 0.7rem;
+      color: var(--ornament);
+      letter-spacing: 0.02em;
+    }
+
+    .left-footer a { color: var(--ornament); text-decoration: none; }
+    .left-footer a:hover { color: var(--text-muted); }
+
+    /* ── Right column ── */
+
+    .right {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 80px 64px;
+      min-height: 100vh;
+    }
+
+    .sonnet-label {
+      font-family: var(--font-ui);
+      font-size: 0.7rem;
+      font-weight: 500;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin-bottom: 32px;
+    }
+
+    .sonnet-text {
+      font-size: 1.45rem;
+      line-height: 1.9;
+    }
+
+    /* ── Explanation (below sonnet, right column) ── */
+
+    .explanation {
+      margin-top: 64px;
+      padding-top: 40px;
+      border-top: 1px solid var(--rule);
+      font-size: 1rem;
+      line-height: 1.8;
+      color: var(--text-muted);
+      max-width: 340px;
+    }
+
+    /* ── Mobile: collapse to single column ── */
+
+    @media (max-width: 768px) {
+      .page {
+        display: block;
+      }
+
+      .left {
+        position: static;
+        height: auto;
+        padding: 80px 32px 0;
+        border-right: none;
+        border-bottom: 1px solid var(--rule);
+        text-align: center;
+      }
+
+      .title { font-size: 3rem; }
+
+      .left-footer { display: none; }
+
+      .right {
+        padding: 48px 32px 80px;
+        min-height: auto;
+      }
+
+      .sonnet-label { text-align: center; }
+      .sonnet-text { font-size: 1.25rem; }
+
+      .explanation {
+        margin-left: auto;
+        margin-right: auto;
+        text-align: center;
+      }
+
+      /* Mobile footer */
+      .mobile-footer {
+        display: block;
+        padding: 24px 32px;
+        border-top: 1px solid var(--rule);
+        font-family: var(--font-ui);
+        font-size: 0.7rem;
+        color: var(--ornament);
+        text-align: center;
+        letter-spacing: 0.02em;
+      }
+      .mobile-footer a { color: var(--ornament); text-decoration: none; }
+      .mobile-footer a:hover { color: var(--text-muted); }
+    }
+
+    @media (min-width: 769px) {
+      .mobile-footer { display: none; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      * { transition: none !important; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="page">
+
+    <!-- Left: identity + CTA (sticky on desktop) -->
+    <div class="left">
+      <h1 class="title">Slow<br>Shakespeare</h1>
+      <p class="tagline">
+        One line per day.<br>
+        Fourteen days.<br>
+        One sonnet memorized.
+      </p>
+      <div class="cta">
+        <a href="../app.html">Begin</a>
+      </div>
+      <div class="left-footer">
+        Ten sonnets &middot; <a href="../app.html">Web</a> &middot; Tidbyt
+      </div>
+    </div>
+
+    <!-- Right: the sonnet -->
+    <div class="right">
+      <div class="sonnet-label">Sonnet 18</div>
+      <p class="sonnet-text">
+        Shall I compare thee to a summer's day?<br>
+        Thou art more lovely and more temperate:<br>
+        Rough winds do shake the darling buds of May,<br>
+        And summer's lease hath all too short a date:<br>
+        Sometime too hot the eye of heaven shines,<br>
+        And often is his gold complexion dimm'd;<br>
+        And every fair from fair sometime declines,<br>
+        By chance, or nature's changing course untrimm'd;<br>
+        But thy eternal summer shall not fade,<br>
+        Nor lose possession of that fair thou ow'st;<br>
+        Nor shall death brag thou wander'st in his shade,<br>
+        When in eternal lines to time thou grow'st:<br>
+        So long as men can breathe, or eyes can see,<br>
+        So long lives this, and this gives life to thee.
+      </p>
+
+      <div class="explanation">
+        Each day reveals one new line.
+        By day fourteen, the whole poem
+        is yours by heart.
+      </div>
+    </div>
+
+  </div>
+
+  <footer class="mobile-footer">
+    Ten sonnets &middot; <a href="../app.html">Web</a> &middot; Tidbyt
+  </footer>
+
+</body>
+</html>
