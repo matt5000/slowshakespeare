@@ -79,10 +79,7 @@
 
       <div class="setting-row setting-group-divider">
         <span class="setting-label">Share</span>
-        <div class="share-controls">
-          <input class="share-url" id="share-url" readonly>
-          <button class="btn-small" id="btn-copy">Copy</button>
-        </div>
+        <button class="btn-small" id="btn-share">Share</button>
       </div>
     </div>
     </div>
@@ -321,8 +318,7 @@ function init() {
   els.swatchContainer = document.getElementById('color-swatches');
   els.toggleLines = document.getElementById('toggle-lines');
   els.toggleSelftest = document.getElementById('toggle-selftest');
-  els.shareUrl = document.getElementById('share-url');
-  els.btnCopy = document.getElementById('btn-copy');
+  els.btnShare = document.getElementById('btn-share');
   els.themeButtons = document.querySelectorAll('.theme-btn');
 
   // Build controls dynamically
@@ -354,7 +350,7 @@ function init() {
   els.toggleSelftest.addEventListener('keydown', (e) => {
     if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onToggleSelftest(); }
   });
-  els.btnCopy.addEventListener('click', onCopy);
+  els.btnShare.addEventListener('click', onShare);
   els.line.addEventListener('click', onLineClick);
   els.themeButtons.forEach(b => b.addEventListener('click', onThemeClick));
 
@@ -364,7 +360,6 @@ function init() {
   });
 
   render();
-  updateShareURL();
 }
 
 function buildDropdown() {
@@ -616,7 +611,6 @@ function fadeToLine(text, index) {
 function toggleSettings() {
   els.settings.classList.toggle('open');
   els.btnSettings.classList.toggle('active');
-  updateShareURL();
 }
 
 function onSonnetChange() {
@@ -625,7 +619,6 @@ function onSonnetChange() {
   if (state.reviewing) stopReview();
   saveToStorage();
   render();
-  updateShareURL();
 }
 
 function onStartChange() {
@@ -636,20 +629,17 @@ function onStartChange() {
   if (state.reviewing) stopReview();
   saveToStorage();
   render();
-  updateShareURL();
 }
 
 function onSwatchClick(name) {
   applyColor(name);
   saveToStorage();
-  updateShareURL();
 }
 
 function onThemeClick(e) {
   state.themePref = e.target.dataset.theme;
   applyTheme();
   saveToStorage();
-  updateShareURL();
 }
 
 function onToggleLines() {
@@ -657,7 +647,6 @@ function onToggleLines() {
   setToggle(els.toggleLines, state.showLines);
   saveToStorage();
   render();
-  updateShareURL();
 }
 
 function onToggleSelftest() {
@@ -668,7 +657,7 @@ function onToggleSelftest() {
   render();
 }
 
-function updateShareURL() {
+function getShareURL() {
   const params = new URLSearchParams();
   params.set('start', state.startDate);
   params.set('sonnet', state.sonnet);
@@ -678,20 +667,29 @@ function updateShareURL() {
   const base = window.location.origin === "null"
     ? window.location.href.split('?')[0]
     : window.location.origin + window.location.pathname;
-  els.shareUrl.value = base + '?' + params.toString();
+  return base + '?' + params.toString();
 }
 
-function onCopy() {
-  els.shareUrl.select();
-  navigator.clipboard.writeText(els.shareUrl.value).then(() => {
-    els.btnCopy.textContent = 'Copied';
-    setTimeout(() => { els.btnCopy.textContent = 'Copy'; }, 2000);
-  }).catch(() => {
-    if (document.execCommand('copy')) {
-      els.btnCopy.textContent = 'Copied';
-      setTimeout(() => { els.btnCopy.textContent = 'Copy'; }, 2000);
-    }
-  });
+function onShare() {
+  const url = getShareURL();
+  const shareData = {
+    title: 'Slow Shakespeare',
+    text: 'Learn Shakespeare\'s sonnets one line at a time',
+    url: url
+  };
+
+  if (navigator.share) {
+    navigator.share(shareData).catch(() => {});
+  } else {
+    // Fallback: copy to clipboard
+    navigator.clipboard.writeText(url).then(() => {
+      els.btnShare.textContent = 'Copied!';
+      setTimeout(() => { els.btnShare.textContent = 'Share'; }, 2000);
+    }).catch(() => {
+      // Final fallback
+      prompt('Copy this link:', url);
+    });
+  }
 }
 
 document.addEventListener('DOMContentLoaded', init);

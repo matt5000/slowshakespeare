@@ -403,8 +403,7 @@ def test_settings_controls():
     assert 'id="color-swatches"' in content
     assert 'id="toggle-lines"' in content
     assert 'id="toggle-selftest"' in content
-    assert 'id="share-url"' in content
-    assert 'id="btn-copy"' in content
+    assert 'id="btn-share"' in content
     print("  ✓ All settings controls present")
 
 
@@ -476,12 +475,13 @@ def test_file_protocol_handling():
     print("  ✓ file:// protocol handled in share URL")
 
 
-def test_clipboard_error_handling():
-    """Clipboard copy has error handling."""
+def test_share_with_fallback():
+    """Share uses Web Share API with clipboard fallback."""
     content = read_html()
+    assert "navigator.share" in content
+    assert "navigator.clipboard" in content
     assert ".catch(" in content
-    assert "execCommand" in content
-    print("  ✓ Clipboard copy has error handling")
+    print("  ✓ Share uses Web Share API with fallback")
 
 
 def test_lines_param_explicit():
@@ -958,7 +958,7 @@ def run_all_tests():
             test_calculate_function,
             test_url_date_validation,
             test_file_protocol_handling,
-            test_clipboard_error_handling,
+            test_share_with_fallback,
             test_lines_param_explicit,
             test_fade_timeout_tracked,
             test_dropdown_reflects_auto_advance,
