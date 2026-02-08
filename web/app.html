@@ -8,6 +8,11 @@
   <meta name="description" content="Learn Shakespeare's sonnets through daily repetition. One new line per day, fourteen days, one sonnet memorized.">
   <link rel="canonical" href="https://slowshakespeare.com/app.html">
   <meta name="theme-color" content="#1a1a1a">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Slow Shakespeare">
+  <link rel="manifest" href="manifest.json">
+  <link rel="apple-touch-icon" href="icon-192.png">
   <meta property="og:title" content="Slow Shakespeare">
   <meta property="og:description" content="Learn Shakespeare's sonnets one line at a time. One new line per day, fourteen days, one sonnet memorized.">
   <meta property="og:type" content="website">
@@ -677,6 +682,11 @@ function onCopy() {
 }
 
 document.addEventListener('DOMContentLoaded', init);
+
+// Register service worker for offline support
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('/sw.js').catch(() => {});
+}
 </script>
 </body>
 </html>
