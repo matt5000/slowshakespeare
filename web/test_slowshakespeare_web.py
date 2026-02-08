@@ -803,6 +803,42 @@ def test_index_no_ios_reference():
     print("  ✓ index.html does not reference nonexistent iOS app")
 
 
+def test_index_hero_section():
+    """index.html has a full-viewport hero section."""
+    content = read_index()
+    assert "100vh" in content, "Missing 100vh hero"
+    assert 'class="hero"' in content, "Missing hero section"
+    assert 'class="hero-cta"' in content, "Missing hero CTA"
+    print("  ✓ index.html has full-viewport hero")
+
+
+def test_index_scroll_reveal():
+    """index.html has scroll-reveal with IntersectionObserver."""
+    content = read_index()
+    assert 'class="reveal' in content or "reveal" in content, "Missing reveal class"
+    assert "IntersectionObserver" in content, "Missing IntersectionObserver"
+    assert ".reveal.visible" in content, "Missing .reveal.visible CSS"
+    print("  ✓ index.html has scroll-reveal animation")
+
+
+def test_index_scroll_hint():
+    """index.html has animated scroll hint."""
+    content = read_index()
+    assert 'class="scroll-hint"' in content, "Missing scroll hint"
+    assert 'aria-hidden="true"' in content, "Scroll hint should be aria-hidden"
+    assert "@keyframes" in content, "Missing scroll hint animation"
+    print("  ✓ index.html has scroll hint with animation")
+
+
+def test_index_no_fleurons():
+    """index.html no longer uses typographic ornaments."""
+    content = read_index()
+    assert "fleuron" not in content, "Should not contain fleuron classes"
+    assert "&#10086;" not in content, "Should not contain fleuron characters"
+    assert "&#10087;" not in content, "Should not contain fleuron characters"
+    print("  ✓ index.html has no fleurons (modern design)")
+
+
 # ---------------------------------------------------------------------------
 # Additional best-practice tests
 # ---------------------------------------------------------------------------
@@ -967,6 +1003,10 @@ def run_all_tests():
             test_index_dark_mode,
             test_index_focus_visible,
             test_index_no_ios_reference,
+            test_index_hero_section,
+            test_index_scroll_reveal,
+            test_index_scroll_hint,
+            test_index_no_fleurons,
         ]),
         ("Best Practices", [
             test_app_has_color_scheme,
