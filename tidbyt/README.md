@@ -17,7 +17,7 @@ Learn Shakespeare's sonnets through slow, daily repetition — one line per day 
 - **Static display**: Rest of the hour shows the newest line
 - **Start date picker**: Begin anytime or sync with friends
 - **Auto-advance**: Moves to next sonnet after 14 days
-- **6 color themes**
+- **5 color themes**
 - **Optional line numbers**
 
 ## Two Versions
@@ -100,9 +100,9 @@ The app supports these settings (via Tidbyt schema):
 | Setting | Options |
 |---------|---------|
 | Sonnet | 1, 18, 29, 30, 55, 73, 104, 116, 130, 138 |
-| Color theme | Choose from 6 colors |
+| Color | Salad Days, Milk of Kindness, Midsummer Night, All That Glisters, Damask Rose |
 | Line numbers | On/Off |
-| Start date | Any date (to restart or sync with friends) |
+| Started | Any date (to restart or sync with friends) |
 
 ## Testing
 

@@ -1,5 +1,9 @@
 # Slow Shakespeare
 
+[![License](https://img.shields.io/badge/license-Apache%202.0-blue.svg)](LICENSE)
+[![Tests](https://img.shields.io/github/actions/workflow/status/matt5000/slowshakespeare/test.yml?label=tests)](https://github.com/matt5000/slowshakespeare/actions/workflows/test.yml)
+[![Website](https://img.shields.io/website?url=https%3A%2F%2Fslowshakespeare.com)](https://slowshakespeare.com)
+
 Learn Shakespeare's sonnets through daily repetition — one new line per day over 14 days.
 
 <p align="center">
@@ -35,6 +39,11 @@ A retro 64x32 LED display that shows your current line. Submitted to the [Tidbyt
 
 A Home Screen widget showing today's line. Coming soon.
 
+## Prerequisites
+
+- Python 3.6+
+- [Pixlet CLI](https://github.com/tidbyt/pixlet) (for Tidbyt development)
+
 ## Development
 
 ```bash
@@ -53,4 +62,4 @@ python3 tidbyt/test_slow_shakespeare.py
 
 ## License
 
-Apache 2.0
+[Apache 2.0](LICENSE)
