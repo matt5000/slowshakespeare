@@ -525,7 +525,7 @@ function render() {
 function showLine(text, index, isReview) {
   if (state.selfTest && !state.selfTestRevealed && !isReview) {
     els.line.classList.add('reveal-overlay');
-    els.line.textContent = 'tap to reveal';
+    els.line.textContent = 'tap to reveal line ' + (index + 1);
   } else {
     els.line.classList.remove('reveal-overlay');
     if (isReview && index === 0) {
