@@ -556,8 +556,12 @@ function onLineClick() {
       state.selfTestIndex++;
       state.selfTestRevealed = false;
       render();
+    } else {
+      // At last line and revealed — cycle back to line 1
+      state.selfTestIndex = 0;
+      state.selfTestRevealed = false;
+      render();
     }
-    // If at last line and revealed, do nothing (stay on last line)
   }
 }
 
