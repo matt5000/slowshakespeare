@@ -2,7 +2,8 @@
 Applet: Slow Shakespeare
 Author: Matt Milligan
 Summary: Learn sonnets daily
-Description: Learn a Shakespeare sonnet one line at a time. One new line per day, 14 days per sonnet. Sync learning with friends by matching start dates.
+Description: Learn a Shakespeare sonnet one line at a time.
+    One new line per day, 14 days per sonnet.
 """
 
 load("render.star", "render")
@@ -180,6 +181,7 @@ DEFAULT_COLOR = "#8FBF8F"  # Salad Days
 SONNET_ORDER = ["1", "18", "29", "30", "55", "73", "104", "116", "130", "138"]
 
 def main(config):
+    """Render today's sonnet line for the Tidbyt display."""
     sonnet_id = config.get("sonnet", "18")
     text_color = config.get("color", DEFAULT_COLOR)
     show_line_number = config.bool("show_line_number", False)
@@ -204,7 +206,10 @@ def main(config):
         total_days = 0
 
     # Each sonnet takes 14 days, figure out which sonnet and which day within it
-    sonnet_index = SONNET_ORDER.index(sonnet_id) if sonnet_id in SONNET_ORDER else 1
+    if sonnet_id in SONNET_ORDER:
+        sonnet_index = SONNET_ORDER.index(sonnet_id)
+    else:
+        sonnet_index = 1
     sonnets_completed = total_days // 14
     day_within_sonnet = total_days % 14
 
@@ -228,131 +233,50 @@ def main(config):
     # The newest line (today's focus)
     newest_line_index = lines_learned - 1
 
-    current_minute = now.minute
+    static_children = [
+        render.Padding(
+            pad = (2, 2, 2, 2),
+            child = render.WrappedText(
+                content = lines[newest_line_index],
+                font = "tom-thumb",
+                color = text_color,
+                align = "left",
+            ),
+        ),
+    ]
 
-    if current_minute == 0:
-        # At :00 — review mode: animate through all lines 3x
-        frames = []
-        for _ in range(3):  # 3 passes
-            for i in range(lines_learned):
-                # Add dot marker for first line only
-                stack_children = [
-                    render.Padding(
-                        pad = (2, 2, 2, 2),
-                        child = render.WrappedText(
-                            content = lines[i],
-                            font = "tom-thumb",
-                            color = text_color,
-                            align = "left",
-                        ),
-                    ),
-                ]
-                if show_line_number:
-                    # Show line number for all lines
-                    stack_children.append(
-                        render.Column(
-                            expanded = True,
-                            main_align = "end",
-                            children = [
-                                render.Row(
-                                    expanded = True,
-                                    main_align = "end",
-                                    children = [
-                                        render.Padding(
-                                            pad = (0, 0, 2, 2),
-                                            child = render.Text(
-                                                content = str(i + 1),
-                                                font = "tom-thumb",
-                                                color = text_color,
-                                            ),
-                                        ),
-                                    ],
+    if show_line_number:
+        static_children.append(
+            render.Column(
+                expanded = True,
+                main_align = "end",
+                children = [
+                    render.Row(
+                        expanded = True,
+                        main_align = "end",
+                        children = [
+                            render.Padding(
+                                pad = (0, 0, 2, 2),
+                                child = render.Text(
+                                    content = str(newest_line_index + 1),
+                                    font = "tom-thumb",
+                                    color = text_color,
                                 ),
-                            ],
-                        ),
-                    )
-                elif i == 0:
-                    # Show dot marker for first line only (when line numbers are off)
-                    stack_children.append(
-                        render.Column(
-                            expanded = True,
-                            main_align = "end",
-                            children = [
-                                render.Row(
-                                    expanded = True,
-                                    main_align = "end",
-                                    children = [
-                                        render.Padding(
-                                            pad = (0, 0, 3, 3),
-                                            child = render.Circle(
-                                                diameter = 3,
-                                                color = text_color,
-                                            ),
-                                        ),
-                                    ],
-                                ),
-                            ],
-                        ),
-                    )
-                frames.append(
-                    render.Stack(
-                        children = stack_children,
+                            ),
+                        ],
                     ),
-                )
-
-        return render.Root(
-            delay = 5000,  # 5 seconds per line
-            child = render.Animation(
-                children = frames,
+                ],
             ),
         )
-    else:
-        # :01-:59 — show the newest line
-        current_line_index = newest_line_index
 
-        static_children = [
-            render.Padding(
-                pad = (2, 2, 2, 2),
-                child = render.WrappedText(
-                    content = lines[current_line_index],
-                    font = "tom-thumb",
-                    color = text_color,
-                    align = "left",
-                ),
-            ),
-        ]
-
-        if show_line_number:
-            static_children.append(
-                render.Column(
-                    expanded = True,
-                    main_align = "end",
-                    children = [
-                        render.Row(
-                            expanded = True,
-                            main_align = "end",
-                            children = [
-                                render.Padding(
-                                    pad = (0, 0, 2, 2),
-                                    child = render.Text(
-                                        content = str(current_line_index + 1),
-                                        font = "tom-thumb",
-                                        color = text_color,
-                                    ),
-                                ),
-                            ],
-                        ),
-                    ],
-                ),
-            )
-
-        return render.Root(
-            child = render.Stack(
-                children = static_children,
-            ),
-        )
+    return render.Root(
+        child = render.Stack(
+            children = static_children,
+        ),
+    )
 
 def get_schema():
+    """Return the Tidbyt configuration schema."""
     return schema.Schema(
         version = "1",
         fields = [

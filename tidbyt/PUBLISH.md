@@ -7,7 +7,7 @@
 **Summary:** Learn sonnets daily
 
 **Description:**
-Learn a sonnet through slow, daily repetition in 14 days. Each day reveals one new line. At the top of every hour, review all lines you've learned so far. The rest of the hour shows your newest line.
+Learn a Shakespeare sonnet one line at a time over 14 days. Each day reveals one new line — today's focus line is always on display.
 
 Choose from ten sonnets:
 - Sonnet 1 – "From fairest creatures we desire increase"
@@ -23,57 +23,52 @@ Choose from ten sonnets:
 
 ## Files
 
-- `slow_shakespeare.star` - Main app (10 sonnets, 6 colors)
+- `slow_shakespeare.star` - Main app (10 sonnets, 5 colors)
 - `manifest.yaml` - Publishing metadata
-- `test_slow_shakespeare.py` - 22 passing tests
+- `test_slow_shakespeare.py` - 26 passing tests
 - `push.sh` - Local deploy script
 
 ## Before Publishing
 
 1. Run tests: `python3 test_slow_shakespeare.py`
 2. Run validation: `pixlet check slow_shakespeare.star`
-3. Preview: `pixlet serve --watch slow_shakespeare.star`
+3. Preview: `pixlet serve slow_shakespeare.star`
 
 ## Publishing Checklist
 
 - [x] App docstring with Applet, Author, Summary, Description
 - [x] manifest.yaml with all required fields
 - [x] Summary under 27 characters
-- [x] `pixlet format` applied
-- [x] `pixlet lint --fix` applied
-- [x] `pixlet check` passes
-- [x] All tests pass
+- [x] `pixlet format` — no changes needed
+- [x] `pixlet lint` — no warnings
+- [x] `pixlet check` passes all 8 validations
+- [x] All 26 tests pass
+- [x] App renders with no config (all defaults work)
+- [x] Render time under 1 second
+- [x] Pixlet version matches community repo (v0.34.0)
 
-## To Publish
+## Submission Steps
 
-1. Fork https://github.com/tidbyt/community (done: https://github.com/matt5000/community)
-2. Clone the fork locally
-3. Copy `slow_shakespeare.star` and `manifest.yaml` to `apps/slowshakespeare/`
+1. Sync fork to latest `main`: https://github.com/matt5000/community
+2. Copy `slow_shakespeare.star` and `manifest.yaml` to `apps/slowshakespeare/`
+3. Run `pixlet check apps/slowshakespeare/slow_shakespeare.star` from community repo
 4. Commit and push to fork
-5. Open PR to tidbyt/community
+5. Open PR to `tidbyt/community`
+6. Sign the CLA when the bot comments on the PR
+7. Wait for review by Tidbyt maintainers
 
 ## Features
 
 - **Start date picker** - Pick a past date to jump ahead, or match a friend's start date to learn together
 - **Auto-advance sonnets** - After completing 14 days, automatically moves to the next sonnet
 - **Line number toggle** - Optional line numbers in bottom-right corner
-- **Test mode toggle** - Force review mode for testing (disable before publishing)
-- **6 Shakespeare-inspired colors** - Salad Days, Yellow Leaves, Milk of Kindness, Midsummer Night, All That Glisters, Damask Rose
+- **5 Shakespeare-inspired colors** - Salad Days, Milk of Kindness, Midsummer Night, All That Glisters, Damask Rose
 
 ## Design Decisions
 
-- **No rotation speed option** - Users who want full review at :00 can manage their own rotation settings
+- **Static display only** - Always shows today's newest line; no animation (Tidbyt's ~15s rotation window makes multi-line review impractical)
 - **Color picker not mentioned in description** - Users discover it when configuring
 - **10 sonnets** - Curated selection of most famous; memory is not a constraint (could add all 154)
 - **tom-thumb font** - Very small but readable on 64x32 display
 - **Left-aligned text** - Book-like feel, no Box wrapper (causes centering)
-- **Dot marker** - 3px circle on bottom-right for first line only during review mode (when line numbers off)
-- **5 second delay** - Per line during review animation
 - **Unix timestamp calculation** - Reliable day counting across timezones
-
-## Testing Notes
-
-- `pixlet render` has a default `--max_duration` of 15 seconds (15000ms)
-- With 5 second frames, only 3 frames show by default
-- Use `--max_duration 150000` to see full animation locally
-- The actual Tidbyt device does NOT have this limit

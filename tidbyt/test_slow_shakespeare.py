@@ -253,48 +253,9 @@ class TestDisplay(TidbytTestCase):
         """Padding applied to content."""
         self.assertIn("pad = (2, 2, 2, 2)", self.content)
 
-    def test_dot_marker_for_first_line(self) -> None:
-        """Dot marker exists for first line."""
-        self.assertIn("if i == 0:", self.content)
-        self.assertIn("render.Circle", self.content)
-        self.assertIn("diameter = 3", self.content)
-
-
-# =============================================================================
-# Review Mode Tests
-# =============================================================================
-
-class TestReviewMode(TidbytTestCase):
-    """Tests for review mode at :00."""
-
-    def test_review_triggers_at_minute_zero(self) -> None:
-        """Review mode triggers at minute 0."""
-        self.assertIn("current_minute == 0", self.content)
-
-    def test_review_loops_3_times(self) -> None:
-        """Review mode loops 3 times."""
-        self.assertIn("for _ in range(3)", self.content)
-
-    def test_animation_delay_is_5_seconds(self) -> None:
-        """Animation delay is 5 seconds (5000ms)."""
-        self.assertIn("delay = 5000", self.content)
-
-    def test_static_display_no_box(self) -> None:
-        """Static display doesn't use Box (which centers)."""
-        else_idx = self.content.find("else:")
-        if else_idx != -1:
-            else_block = self.content[else_idx:]
-            self.assertIn("return render.Root", else_block)
-            self.assertNotIn("render.Box", else_block)
-
-    def test_animation_frames_no_box(self) -> None:
-        """Animation frames don't use Box (which centers)."""
-        else_idx = self.content.find("else:")
-        review_section = self.content[:else_idx] if else_idx != -1 else ""
-        append_idx = review_section.find("frames.append")
-        if append_idx != -1:
-            append_section = review_section[append_idx:append_idx + 200]
-            self.assertNotIn("render.Box", append_section)
+    def test_no_box_widget(self) -> None:
+        """No Box widget (which centers content)."""
+        self.assertNotIn("render.Box", self.content)
 
 
 # =============================================================================
@@ -303,10 +264,6 @@ class TestReviewMode(TidbytTestCase):
 
 class TestProductionMode(TidbytTestCase):
     """Tests for production mode (not test mode)."""
-
-    def test_uses_real_minute(self) -> None:
-        """Uses real minute calculation."""
-        self.assertIn("current_minute = now.minute", self.content)
 
     def test_uses_real_day_calculation(self) -> None:
         """Uses real day calculation."""
@@ -348,7 +305,6 @@ def run_all_tests() -> bool:
         TestSonnetContent,
         TestSchema,
         TestDisplay,
-        TestReviewMode,
         TestProductionMode,
     ]
 
