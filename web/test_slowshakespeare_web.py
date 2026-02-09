@@ -785,12 +785,13 @@ def test_index_focus_visible():
     print("  ✓ index.html uses :focus-visible")
 
 
-def test_index_no_ios_reference():
-    """index.html does not reference iOS (no app exists yet)."""
+def test_index_ios_coming_soon():
+    """index.html mentions iOS as coming soon (not available yet)."""
     content = read_index()
-    # Check footer area specifically — "iOS" as a standalone word
-    assert "iOS" not in content, "Footer references iOS but no iOS app exists"
-    print("  ✓ index.html does not reference nonexistent iOS app")
+    # iOS can be mentioned but only as "coming soon"
+    if "iOS" in content:
+        assert "coming soon" in content, "iOS mentioned without 'coming soon' disclaimer"
+    print("  ✓ index.html correctly labels iOS as coming soon")
 
 
 def test_index_hero_section():
@@ -991,7 +992,7 @@ def run_all_tests():
             test_index_reduced_motion,
             test_index_dark_mode,
             test_index_focus_visible,
-            test_index_no_ios_reference,
+            test_index_ios_coming_soon,
             test_index_hero_section,
             test_index_scroll_reveal,
             test_index_scroll_hint,
