@@ -57,7 +57,3 @@ pixlet serve --watch tidbyt/slow_shakespeare.star
 # Tidbyt — run tests
 python3 tidbyt/test_slow_shakespeare.py
 ```
-
-## License
-
-[Apache 2.0](LICENSE)
