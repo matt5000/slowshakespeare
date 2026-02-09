@@ -2,7 +2,7 @@
 Applet: Slow Shakespeare
 Author: Matt Milligan
 Summary: Learn sonnets daily
-Description: Learn a sonnet through slow, daily repetition in 14 days. Pick a start date to restart a sonnet or sync with a friend.
+Description: Learn a Shakespeare sonnet one line at a time. One new line per day, 14 days per sonnet. Sync learning with friends by matching start dates.
 """
 
 load("render.star", "render")
@@ -360,62 +360,62 @@ def get_schema():
             schema.Dropdown(
                 id = "sonnet",
                 name = "Sonnet",
-                desc = "Which Shakespeare sonnet to memorize",
+                desc = "Choose a sonnet to memorize",
                 icon = "book",
                 default = "18",
                 options = [
                     schema.Option(
-                        display = "Sonnet 1 - From fairest creatures...",
+                        display = "1: From fairest creatures...",
                         value = "1",
                     ),
                     schema.Option(
-                        display = "Sonnet 18 - Shall I compare thee...",
+                        display = "18: Shall I compare thee...",
                         value = "18",
                     ),
                     schema.Option(
-                        display = "Sonnet 29 - When in disgrace...",
+                        display = "29: When in disgrace...",
                         value = "29",
                     ),
                     schema.Option(
-                        display = "Sonnet 30 - When to the sessions...",
+                        display = "30: When to the sessions...",
                         value = "30",
                     ),
                     schema.Option(
-                        display = "Sonnet 55 - Not marble nor...",
+                        display = "55: Not marble nor...",
                         value = "55",
                     ),
                     schema.Option(
-                        display = "Sonnet 73 - That time of year...",
+                        display = "73: That time of year...",
                         value = "73",
                     ),
                     schema.Option(
-                        display = "Sonnet 104 - To me, fair friend...",
+                        display = "104: To me, fair friend...",
                         value = "104",
                     ),
                     schema.Option(
-                        display = "Sonnet 116 - Let me not to the marriage...",
+                        display = "116: Let me not to the marriage...",
                         value = "116",
                     ),
                     schema.Option(
-                        display = "Sonnet 130 - My mistress' eyes...",
+                        display = "130: My mistress' eyes...",
                         value = "130",
                     ),
                     schema.Option(
-                        display = "Sonnet 138 - When my love swears...",
+                        display = "138: When my love swears...",
                         value = "138",
                     ),
                 ],
             ),
             schema.DateTime(
                 id = "start_date",
-                name = "Day 1",
-                desc = "Today by default. Pick a past date to jump ahead, or match a friend's start date to learn together.",
+                name = "Started",
+                desc = "Sync with a friend by matching start dates",
                 icon = "calendar",
             ),
             schema.Dropdown(
                 id = "color",
-                name = "Text Color",
-                desc = "Color of the poem text",
+                name = "Color",
+                desc = "Text color",
                 icon = "palette",
                 default = "#8FBF8F",
                 options = [
@@ -443,16 +443,9 @@ def get_schema():
             ),
             schema.Toggle(
                 id = "show_line_number",
-                name = "Show Line Number",
-                desc = "Display the current line number in the corner",
+                name = "Line numbers",
+                desc = "Show line number in corner",
                 icon = "hashtag",
-                default = False,
-            ),
-            schema.Toggle(
-                id = "test_mode",
-                name = "Test Mode",
-                desc = "Force review mode for testing (disable before publishing)",
-                icon = "flask",
                 default = False,
             ),
         ],
