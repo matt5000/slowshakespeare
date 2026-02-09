@@ -183,7 +183,6 @@ def main(config):
     sonnet_id = config.get("sonnet", "18")
     text_color = config.get("color", DEFAULT_COLOR)
     show_line_number = config.bool("show_line_number", False)
-    test_mode = config.bool("test_mode", False)
 
     now = time.now()
 
@@ -231,7 +230,7 @@ def main(config):
 
     current_minute = now.minute
 
-    if current_minute == 0 or test_mode:
+    if current_minute == 0:
         # At :00 — review mode: animate through all lines 3x
         frames = []
         for _ in range(3):  # 3 passes
