@@ -281,6 +281,9 @@
 
 <script src="data.js"></script>
 <script>
+// Constants
+const MS_PER_DAY = 86400000;
+
 // State
 let state = {
   sonnet: "18",
@@ -434,7 +437,9 @@ function loadFromStorage() {
     if (!params.has('color') && data.colorName) state.colorName = data.colorName;
     if (!params.has('lines') && data.showLines !== undefined) state.showLines = data.showLines;
     if (!params.has('theme') && data.themePref) state.themePref = data.themePref;
-  } catch (e) {}
+  } catch (e) {
+    // Ignore malformed localStorage data
+  }
 }
 
 function saveToStorage() {
@@ -470,7 +475,7 @@ function calculate() {
   const start = new Date(state.startDate + 'T00:00:00');
   const now = new Date();
   const todayMidnight = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-  const totalDays = Math.floor((todayMidnight - start) / 86400000);
+  const totalDays = Math.floor((todayMidnight - start) / MS_PER_DAY);
   const safeDays = Math.max(0, totalDays);
 
   const sonnetIndex = Math.max(0, SONNET_ORDER.indexOf(state.sonnet));
@@ -519,7 +524,11 @@ function escapeHTML(str) {
 
 // Review mode
 function toggleReview() {
-  if (state.reviewing) stopReview(); else startReview();
+  if (state.reviewing) {
+    stopReview();
+  } else {
+    startReview();
+  }
 }
 
 function startReview() {

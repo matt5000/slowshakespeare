@@ -11,6 +11,7 @@ import os
 import re
 import sys
 from datetime import date, timedelta
+from typing import Optional
 
 APP_DIR = os.path.dirname(os.path.abspath(__file__))
 HTML_FILE = os.path.join(APP_DIR, "app.html")
@@ -58,37 +59,55 @@ COLORS = {
 }
 
 
-def read_file(path):
+def read_file(path: str) -> str:
+    """Read and return the contents of a file."""
     with open(path, "r", encoding="utf-8") as f:
         return f.read()
 
 
-def read_html():
+def read_html() -> str:
+    """Read the main app HTML file."""
     return read_file(HTML_FILE)
 
 
-def read_index():
+def read_index() -> str:
+    """Read the index/landing page HTML file."""
     return read_file(INDEX_FILE)
 
 
-def read_css():
+def read_css() -> str:
+    """Read the CSS file."""
     return read_file(CSS_FILE)
 
 
-def read_data_js():
+def read_data_js() -> str:
+    """Read the data.js file."""
     return read_file(DATA_JS_FILE)
 
 
-def read_tidbyt():
+def read_tidbyt() -> Optional[str]:
+    """Read the Tidbyt Starlark file, or None if it doesn't exist."""
     if not os.path.exists(TIDBYT_FILE):
         return None
     return read_file(TIDBYT_FILE)
 
 
-def calculate(start_date_str, sonnet_id, today=None):
+def calculate(
+    start_date_str: str,
+    sonnet_id: str,
+    today: Optional[date] = None
+) -> dict:
     """Reimplement the JS calculate() function in Python.
 
     This must exactly match the logic in app.html.
+
+    Args:
+        start_date_str: ISO format date string (YYYY-MM-DD).
+        sonnet_id: The sonnet ID to start from.
+        today: Optional date to use as "today" (for testing).
+
+    Returns:
+        Dict with currentSonnetId, linesLearned, dayWithinSonnet, safeDays.
     """
     if today is None:
         today = date.today()
@@ -149,7 +168,8 @@ def test_auto_advance():
     """After 14 days, advances to next sonnet."""
     today = date(2025, 6, 15)
     r = calculate("2025-06-01", "18", today)  # 14 days later
-    assert r["currentSonnetId"] == "29", f"Expected 29, got {r['currentSonnetId']}"
+    assert r["currentSonnetId"] == "29", \
+        f"Expected 29, got {r['currentSonnetId']}"
     assert r["dayWithinSonnet"] == 0
     assert r["linesLearned"] == 1
     print("  ✓ Auto-advance to next sonnet")
@@ -159,7 +179,8 @@ def test_auto_advance_second():
     """After 28 days, advances two sonnets."""
     today = date(2025, 6, 15)
     r = calculate("2025-05-18", "18", today)  # 28 days
-    assert r["currentSonnetId"] == "30", f"Expected 30, got {r['currentSonnetId']}"
+    assert r["currentSonnetId"] == "30", \
+        f"Expected 30, got {r['currentSonnetId']}"
     assert r["dayWithinSonnet"] == 0
     print("  ✓ Auto-advance two sonnets")
 
@@ -167,9 +188,10 @@ def test_auto_advance_second():
 def test_wrap_around():
     """After cycling through all 10 sonnets, wraps to beginning."""
     today = date(2025, 6, 15)
-    # Start at sonnet 138 (index 9), 14 days ago => should wrap to sonnet 1 (index 0)
+    # Start at sonnet 138 (index 9), 14 days ago => wraps to sonnet 1
     r = calculate("2025-06-01", "138", today)
-    assert r["currentSonnetId"] == "1", f"Expected 1, got {r['currentSonnetId']}"
+    assert r["currentSonnetId"] == "1", \
+        f"Expected 1, got {r['currentSonnetId']}"
     print("  ✓ Wrap-around past sonnet 138")
 
 
@@ -178,7 +200,8 @@ def test_full_cycle_wrap():
     today = date(2025, 6, 15)
     start = today - timedelta(days=140)
     r = calculate(start.isoformat(), "1", today)
-    assert r["currentSonnetId"] == "1", f"Expected 1, got {r['currentSonnetId']}"
+    assert r["currentSonnetId"] == "1", \
+        f"Expected 1, got {r['currentSonnetId']}"
     assert r["dayWithinSonnet"] == 0
     print("  ✓ Full cycle (140 days) wraps to start")
 
@@ -239,7 +262,8 @@ def test_each_sonnet_has_14_lines():
         pattern = rf'"{sid}":\s*\[(.*?)\]'
         match = re.search(pattern, content, re.DOTALL)
         assert match, f"Could not find sonnet {sid} array"
-        lines = [l.strip() for l in match.group(1).split("\n") if l.strip().startswith('"')]
+        raw_lines = match.group(1).split("\n")
+        lines = [ln.strip() for ln in raw_lines if ln.strip().startswith('"')]
         assert len(lines) == 14, (
             f"Sonnet {sid}: expected 14 lines, got {len(lines)}"
         )
@@ -270,17 +294,22 @@ def test_all_colors_in_html():
     """All 6 color themes present with correct hex values in data.js."""
     content = read_data_js()
     for name, vals in COLORS.items():
-        assert vals["dark"] in content, f"Missing dark variant for {name}: {vals['dark']}"
-        assert vals["light"] in content, f"Missing light variant for {name}: {vals['light']}"
-        assert vals["swatch"] in content, f"Missing swatch for {name}: {vals['swatch']}"
+        assert vals["dark"] in content, \
+            f"Missing dark variant for {name}: {vals['dark']}"
+        assert vals["light"] in content, \
+            f"Missing light variant for {name}: {vals['light']}"
+        assert vals["swatch"] in content, \
+            f"Missing swatch for {name}: {vals['swatch']}"
     print("  ✓ All 6 color themes present with correct hex values")
 
 
 def test_color_labels_present():
     """All color labels present in data.js."""
     content = read_data_js()
-    labels = ["Salad Days", "Milk of Kindness",
-              "Midsummer Night", "All That Glisters", "Damask Rose", "Black Ink"]
+    labels = [
+        "Salad Days", "Milk of Kindness", "Midsummer Night",
+        "All That Glisters", "Damask Rose", "Black Ink"
+    ]
     for label in labels:
         assert label in content, f"Missing color label: {label}"
     print("  ✓ All 6 color labels present")
@@ -364,8 +393,10 @@ def test_no_duplicate_css_blocks():
     root_count = len(re.findall(r"^\s*:root\s*\{", content, re.MULTILINE))
     assert root_count == 1, f"Expected 1 :root block, found {root_count}"
     # Count .setting-label blocks (should be exactly 1)
-    label_count = len(re.findall(r"^\s*\.setting-label\s*\{", content, re.MULTILINE))
-    assert label_count == 1, f"Expected 1 .setting-label block, found {label_count}"
+    pattern = r"^\s*\.setting-label\s*\{"
+    label_count = len(re.findall(pattern, content, re.MULTILINE))
+    assert label_count == 1, \
+        f"Expected 1 .setting-label block, found {label_count}"
     print("  ✓ No duplicate CSS blocks")
 
 
@@ -381,8 +412,10 @@ def test_sonnet_dropdown():
     """Dropdown is built dynamically from SONNETS data."""
     content = read_html()
     assert 'id="select-sonnet"' in content, "Missing dropdown element"
-    assert "function buildDropdown()" in content, "Missing buildDropdown function"
-    assert "SONNET_ORDER.forEach" in content, "Dropdown not built from SONNET_ORDER"
+    assert "function buildDropdown()" in content, \
+        "Missing buildDropdown function"
+    assert "SONNET_ORDER.forEach" in content, \
+        "Dropdown not built from SONNET_ORDER"
     print("  ✓ Dropdown built dynamically from SONNETS data")
 
 
@@ -428,10 +461,12 @@ def test_body_uses_ui_font():
     """Body font-family is --font-ui; poetry uses --font-content."""
     content = read_css()
     # Body should use UI font
-    body_match = re.search(r"body\s*\{[^}]*font-family:\s*var\(--font-ui\)", content)
+    body_pattern = r"body\s*\{[^}]*font-family:\s*var\(--font-ui\)"
+    body_match = re.search(body_pattern, content)
     assert body_match, "Body should use --font-ui as default"
     # .line should use content font
-    line_match = re.search(r"\.line\s*\{[^}]*font-family:\s*var\(--font-content\)", content)
+    line_pattern = r"\.line\s*\{[^}]*font-family:\s*var\(--font-content\)"
+    line_match = re.search(line_pattern, content)
     assert line_match, ".line should use --font-content for poetry"
     print("  ✓ Body uses --font-ui, poetry uses --font-content")
 
@@ -439,7 +474,8 @@ def test_body_uses_ui_font():
 def test_responsive_breakpoint():
     """Responsive CSS media query present for small screens."""
     content = read_css()
-    assert re.search(r"@media\s*\(\s*max-width", content), "Missing responsive media query"
+    assert re.search(r"@media\s*\(\s*max-width", content), \
+        "Missing responsive media query"
     assert "480px" in content, "Missing 480px breakpoint"
     print("  ✓ Responsive breakpoint present")
 
@@ -452,7 +488,8 @@ def test_calculate_function():
     """calculate() function exists with correct structure."""
     content = read_html()
     assert "function calculate()" in content
-    assert "Math.floor((todayMidnight - start) / 86400000)" in content
+    assert "MS_PER_DAY" in content  # Named constant for milliseconds/day
+    assert "Math.floor((todayMidnight - start) / MS_PER_DAY)" in content
     assert "Math.max(0, totalDays)" in content
     assert "SONNET_ORDER.indexOf(state.sonnet)" in content
     print("  ✓ calculate() function with correct structure")
@@ -536,7 +573,8 @@ def test_dot_marker():
 def test_date_input_validation():
     """onStartChange guards against empty date input."""
     content = read_html()
-    assert "if (!value) return;" in content, "Missing empty date guard in onStartChange"
+    assert "if (!value) return;" in content, \
+        "Missing empty date guard in onStartChange"
     print("  ✓ Empty date input guarded")
 
 
@@ -601,7 +639,8 @@ def test_data_js_exists():
 def test_data_js_loaded():
     """app.html loads data.js before inline script."""
     content = read_html()
-    assert '<script src="data.js"></script>' in content, "Missing data.js script tag"
+    assert '<script src="data.js"></script>' in content, \
+        "Missing data.js script tag"
     # data.js must appear before the inline script
     data_pos = content.index('<script src="data.js">')
     inline_pos = content.index('<script>', data_pos + 1)
@@ -624,7 +663,8 @@ def test_seo_sonnets_section():
     assert 'id="sonnets"' in content, "Missing sonnets section"
     assert 'class="seo-sonnets"' in content, "Missing seo-sonnets class"
     for sid in SONNET_ORDER:
-        assert f"Sonnet {sid}" in content, f"Missing Sonnet {sid} in SEO section"
+        assert f"Sonnet {sid}" in content, \
+            f"Missing Sonnet {sid} in SEO section"
     print("  ✓ All 10 sonnets in SEO section")
 
 
@@ -658,9 +698,12 @@ def test_twitter_cards():
     app = read_html()
     index = read_index()
     for name, content in [("app.html", app), ("index.html", index)]:
-        assert 'twitter:card' in content, f"Missing twitter:card in {name}"
-        assert 'twitter:title' in content, f"Missing twitter:title in {name}"
-        assert 'twitter:description' in content, f"Missing twitter:description in {name}"
+        assert 'twitter:card' in content, \
+            f"Missing twitter:card in {name}"
+        assert 'twitter:title' in content, \
+            f"Missing twitter:title in {name}"
+        assert 'twitter:description' in content, \
+            f"Missing twitter:description in {name}"
     print("  ✓ Twitter Card meta tags on both pages")
 
 
@@ -766,7 +809,8 @@ def test_index_responsive():
 def test_index_reduced_motion():
     """index.html respects prefers-reduced-motion."""
     content = read_index()
-    assert "prefers-reduced-motion" in content, "Missing reduced motion media query"
+    assert "prefers-reduced-motion" in content, \
+        "Missing reduced motion media query"
     print("  ✓ index.html respects prefers-reduced-motion")
 
 
@@ -790,7 +834,8 @@ def test_index_ios_coming_soon():
     content = read_index()
     # iOS can be mentioned but only as "coming soon"
     if "iOS" in content:
-        assert "coming soon" in content, "iOS mentioned without 'coming soon' disclaimer"
+        assert "coming soon" in content, \
+            "iOS mentioned without 'coming soon' disclaimer"
     print("  ✓ index.html correctly labels iOS as coming soon")
 
 
@@ -806,7 +851,8 @@ def test_index_hero_section():
 def test_index_scroll_reveal():
     """index.html has scroll-reveal with IntersectionObserver."""
     content = read_index()
-    assert 'class="reveal' in content or "reveal" in content, "Missing reveal class"
+    has_reveal = 'class="reveal' in content or "reveal" in content
+    assert has_reveal, "Missing reveal class"
     assert "IntersectionObserver" in content, "Missing IntersectionObserver"
     assert ".reveal.visible" in content, "Missing .reveal.visible CSS"
     print("  ✓ index.html has scroll-reveal animation")
@@ -837,15 +883,18 @@ def test_index_no_fleurons():
 def test_app_has_color_scheme():
     """app.html has color-scheme meta tag."""
     content = read_html()
-    assert 'name="color-scheme"' in content, "Missing color-scheme meta in app.html"
+    assert 'name="color-scheme"' in content, \
+        "Missing color-scheme meta in app.html"
     print("  ✓ app.html has color-scheme meta")
 
 
 def test_reduced_motion_css():
     """style.css respects prefers-reduced-motion."""
     content = read_css()
-    assert "prefers-reduced-motion" in content, "Missing reduced motion in style.css"
-    assert "transition: none" in content, "Should disable transitions for reduced motion"
+    assert "prefers-reduced-motion" in content, \
+        "Missing reduced motion in style.css"
+    assert "transition: none" in content, \
+        "Should disable transitions for reduced motion"
     print("  ✓ style.css respects prefers-reduced-motion")
 
 
@@ -854,7 +903,8 @@ def test_escape_html_function():
     content = read_html()
     assert "function escapeHTML(" in content, "Missing escapeHTML function"
     # Should use textContent for safe escaping (not regex replacement)
-    assert "textContent" in content, "escapeHTML should use textContent for safety"
+    assert "textContent" in content, \
+        "escapeHTML should use textContent for safety"
     print("  ✓ escapeHTML function present for XSS prevention")
 
 
