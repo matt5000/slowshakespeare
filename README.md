@@ -26,7 +26,7 @@ Features:
 
 ### Tidbyt
 
-A retro 64x32 LED display that shows your current line. Submittable to the [Tidbyt Community](https://github.com/tidbyt/community) app store.
+A retro 64x32 LED display that shows your current line. Submitted to the [Tidbyt Community](https://github.com/tidbyt/community) app store.
 
 - **Code:** [`tidbyt/`](tidbyt/)
 - **Setup:** See [`tidbyt/README.md`](tidbyt/README.md)
