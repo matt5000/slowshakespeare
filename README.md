@@ -17,7 +17,6 @@ Each day reveals one new line of a sonnet. By day 14, you've memorized the whole
 A progressive web app (PWA) that works on any device. Add to your home screen for a native app experience.
 
 Features:
-- **Self-test mode** — tap through each line to test your memory
 - **Review mode** — auto-animate through learned lines
 - **6 color themes** + dark/light mode
 - **Share links** — send your progress to friends

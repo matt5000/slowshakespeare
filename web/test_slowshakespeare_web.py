@@ -402,7 +402,6 @@ def test_settings_controls():
     assert 'id="input-start"' in content
     assert 'id="color-swatches"' in content
     assert 'id="toggle-lines"' in content
-    assert 'id="toggle-selftest"' in content
     assert 'id="btn-share"' in content
     print("  ✓ All settings controls present")
 
@@ -524,16 +523,6 @@ def test_review_mode_structure():
     assert "clearInterval(" in content
     assert "5000" in content  # 5 second interval
     print("  ✓ Review mode structure correct")
-
-
-def test_selftest_mode():
-    """Self-test mode cycles through lines with reveal logic."""
-    content = read_html()
-    assert "state.selfTest" in content
-    assert "state.selfTestIndex" in content
-    assert "state.selfTestRevealed" in content
-    assert "tap to reveal" in content
-    print("  ✓ Self-test mode present")
 
 
 def test_dot_marker():
@@ -965,7 +954,6 @@ def run_all_tests():
             test_dropdown_reflects_auto_advance,
             test_localstorage_key,
             test_review_mode_structure,
-            test_selftest_mode,
             test_dot_marker,
             test_date_input_validation,
             test_sonnet_id_validation_storage,
